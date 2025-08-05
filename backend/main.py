@@ -106,7 +106,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return response
 
 
-@app.get("/ebug-token")
+@app.get("/debug-token")
 def debug_token(access_token: str = Cookie(None)):
     print("🔍 Raw token from cookie:", access_token, flush=True)
     username = verify_access_token(access_token)

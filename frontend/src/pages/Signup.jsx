@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Box, Input, Button, Heading, VStack } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Signup() {
@@ -13,6 +14,8 @@ export default function Signup() {
       });
       if (res.data.checkout_url) {
         window.location.href = res.data.checkout_url;
+      } else if (res.status === 200) {
+        NavigationHistoryEntry("/account")
       } else {
         alert("Error: " + (res.data.error || "Unknown error"));
       }

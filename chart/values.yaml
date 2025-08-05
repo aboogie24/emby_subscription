@@ -30,7 +30,7 @@ frontend:
     repository: aboogie/emby-frontend
     tag: v0.0.0
   replicas: 1
-  port: 80
+  port: 5173
   env:
     VITE_API_URL: "http://emby-backend:8000"
     VITE_ALLOWED_HOSTS: "signup.justpurple.org,proxy.justpurple.org"

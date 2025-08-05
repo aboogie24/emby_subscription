@@ -1,0 +1,200 @@
+/* Space-themed background inspired by the "JUST PURPLE" image */
+.space-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -10;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #1a0033 0%, #2d1b69 25%, #4c2a85 50%, #663399 75%, #1a0033 100%);
+  overflow: hidden;
+}
+
+.space-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(2px 2px at 160px 30px, #fff, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: sparkle 20s linear infinite;
+}
+
+.space-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 25px 5px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 50px 25px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 125px 20px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 150px 75px, rgba(255, 255, 255, 0.2), transparent);
+  background-repeat: repeat;
+  background-size: 180px 120px;
+  animation: sparkle 25s linear infinite reverse;
+}
+
+/* Floating particles */
+.space-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: float 15s infinite linear;
+}
+
+.particle:nth-child(1) {
+  width: 3px;
+  height: 3px;
+  left: 10%;
+  animation-delay: 0s;
+  animation-duration: 20s;
+}
+
+.particle:nth-child(2) {
+  width: 2px;
+  height: 2px;
+  left: 20%;
+  animation-delay: 2s;
+  animation-duration: 18s;
+}
+
+.particle:nth-child(3) {
+  width: 4px;
+  height: 4px;
+  left: 30%;
+  animation-delay: 4s;
+  animation-duration: 22s;
+}
+
+.particle:nth-child(4) {
+  width: 2px;
+  height: 2px;
+  left: 40%;
+  animation-delay: 6s;
+  animation-duration: 16s;
+}
+
+.particle:nth-child(5) {
+  width: 3px;
+  height: 3px;
+  left: 50%;
+  animation-delay: 8s;
+  animation-duration: 24s;
+}
+
+.particle:nth-child(6) {
+  width: 2px;
+  height: 2px;
+  left: 60%;
+  animation-delay: 10s;
+  animation-duration: 19s;
+}
+
+.particle:nth-child(7) {
+  width: 4px;
+  height: 4px;
+  left: 70%;
+  animation-delay: 12s;
+  animation-duration: 21s;
+}
+
+.particle:nth-child(8) {
+  width: 2px;
+  height: 2px;
+  left: 80%;
+  animation-delay: 14s;
+  animation-duration: 17s;
+}
+
+.particle:nth-child(9) {
+  width: 3px;
+  height: 3px;
+  left: 90%;
+  animation-delay: 16s;
+  animation-duration: 23s;
+}
+
+@keyframes sparkle {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-100px); }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Purple planet effect */
+.space-planet {
+  position: fixed;
+  top: 10%;
+  right: 10%;
+  width: 150px;
+  height: 150px;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(255, 119, 198, 0.8) 0%, rgba(120, 119, 198, 0.6) 40%, rgba(75, 0, 130, 0.9) 100%);
+  border-radius: 50%;
+  z-index: 0;
+  animation: planetRotate 30s linear infinite;
+}
+
+.space-planet::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180px;
+  height: 20px;
+  background: 
+    linear-gradient(90deg, transparent 0%, rgba(255, 119, 198, 0.3) 20%, rgba(255, 119, 198, 0.6) 50%, rgba(255, 119, 198, 0.3) 80%, transparent 100%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotateX(75deg);
+  animation: ringRotate 20s linear infinite;
+}
+
+@keyframes planetRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes ringRotate {
+  0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
+  100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
+}

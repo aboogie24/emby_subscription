@@ -7,6 +7,21 @@ import Login from "./pages/Login";
 export default function App() {
   return (
     <Router>
+      {/* Space background elements */}
+      <div className="space-background"></div>
+      <div className="space-particles">
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+      </div>
+      <div className="space-planet"></div>
+      
       <Navbar />
       <Routes>
         <Route path="/" element={<Signup />} />

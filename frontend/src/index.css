@@ -1,11 +1,22 @@
+@import './space-background.css';
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: #1a0033;
+
+  /* Purple theme colors inspired by the space image */
+  --primary-purple: #663399;
+  --secondary-purple: #4c2a85;
+  --accent-pink: #ff77c6;
+  --dark-purple: #2d1b69;
+  --deep-space: #1a0033;
+  --light-purple: #7877c6;
+  --glow-purple: #9d4edd;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,11 +26,13 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--accent-pink);
   text-decoration: inherit;
+  transition: color 0.3s ease;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--glow-purple);
+  text-shadow: 0 0 8px rgba(157, 78, 221, 0.6);
 }
 
 body {
@@ -28,41 +41,144 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #1a0033 0%, #2d1b69 25%, #4c2a85 50%, #663399 75%, #1a0033 100%);
+  position: relative;
+}
+
+/* Add animated stars */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.7), transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: sparkle 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes sparkle {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-100px); }
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  color: var(--accent-pink);
+  text-shadow: 0 0 20px rgba(255, 119, 198, 0.5);
+}
+
+h2 {
+  color: var(--light-purple);
+  text-shadow: 0 0 10px rgba(120, 119, 198, 0.4);
+}
+
+h3 {
+  color: var(--glow-purple);
 }
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 2px solid var(--primary-purple);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background: linear-gradient(135deg, var(--secondary-purple), var(--primary-purple));
+  color: rgba(255, 255, 255, 0.95);
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 51, 153, 0.3);
 }
 
+button:hover {
+  border-color: var(--accent-pink);
+  background: linear-gradient(135deg, var(--primary-purple), var(--glow-purple));
+  box-shadow: 0 6px 20px rgba(157, 78, 221, 0.5);
+  transform: translateY(-2px);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 2px solid var(--accent-pink);
+  outline-offset: 2px;
+}
+
+button:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 10px rgba(102, 51, 153, 0.4);
+}
+
+/* Input styling to match the theme */
+input, textarea, select {
+  background: rgba(45, 27, 105, 0.3);
+  border: 2px solid var(--secondary-purple);
+  border-radius: 8px;
+  padding: 0.8em 1.5em;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 15px rgba(255, 119, 198, 0.3);
+  background: rgba(45, 27, 105, 0.5);
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Card/container styling */
+.card, .container {
+  background: rgba(45, 27, 105, 0.2);
+  border: 1px solid rgba(102, 51, 153, 0.3);
+  border-radius: 12px;
+  padding: 2em;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(26, 0, 51, 0.5);
+}
+
+/* Text colors for better contrast */
+.text-muted {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.text-accent {
+  color: var(--accent-pink);
+}
+
+.text-primary {
+  color: var(--primary-purple);
+}
+
+/* Remove light mode styles since we're going full space theme */
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: rgba(255, 255, 255, 0.95);
+    background-color: #1a0033;
   }
   a:hover {
-    color: #747bff;
+    color: var(--glow-purple);
   }
   button {
-    background-color: #f9f9f9;
+    background: linear-gradient(135deg, var(--secondary-purple), var(--primary-purple));
+    color: rgba(255, 255, 255, 0.95);
   }
 }

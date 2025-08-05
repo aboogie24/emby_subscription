@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Box, Input, Button, Heading, VStack } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -19,7 +18,7 @@ export default function Login() {
         withCredentials: true // Allow cookies
       });
 
-      console.log("Login rponse:", res.data)
+      console.log("Login response:", res.data);
       setTimeout(() => navigate("/account"), 100);
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message); 
@@ -28,13 +27,53 @@ export default function Login() {
   };
 
   return (
-    <Box bg="gray.800" minH="100vh" display="flex" alignItems="center" justifyContent="center">
-      <VStack bg="gray.700" p={8} borderRadius="md" spacing={4} width="350px">
-        <Heading color="white">Login</Heading>
-        <Input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} bg="white"/>
-        <Input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} bg="white"/>
-        <Button colorScheme="green" width="100%" onClick={handleLogin}>Login</Button>
-      </VStack>
-    </Box>
+    <div style={{ 
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100vh",
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      padding: "2rem",
+      zIndex: 1
+    }}>
+      <div className="form-container">
+        <h1 className="form-title">Welcome Back</h1>
+        <p className="form-subtitle">Sign in to your Emby account</p>
+        
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input 
+            id="username"
+            type="text"
+            placeholder="Enter your username" 
+            value={username} 
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input 
+            id="password"
+            type="password"
+            placeholder="Enter your password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        
+        <button onClick={handleLogin} style={{ width: "100%", marginTop: "1rem" }}>
+          Sign In
+        </button>
+        
+        <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+          <span className="text-muted">Don't have an account? </span>
+          <a href="/" className="text-accent">Sign up here</a>
+        </div>
+      </div>
+    </div>
   );
 }

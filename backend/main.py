@@ -94,7 +94,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     }
 
     r = requests.post(url, headers=headers, json=payload)
-    print(r.json())
+    print(r.status_code, r.text)
     if r.status_code != 200:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 

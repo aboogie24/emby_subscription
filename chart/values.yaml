@@ -34,5 +34,6 @@ frontend:
 ingress:
   enabled: true
   host: emby.yourdomain.com
+  className: nginx
   tls:
     enabled: false

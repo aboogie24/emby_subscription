@@ -64,8 +64,8 @@ jobs:
 
       - name: Update Chart.yaml with Version
         run: |
-          yq e -i ".version = \"${VERSION#v}\"" ./emby-subscription-chart/Chart.yaml
-          yq e -i ".appVersion = \"${VERSION#v}\"" ./emby-subscription-chart/Chart.yaml
+          yq e -i ".version = \"${VERSION#v}\"" ./chart/Chart.yaml
+          yq e -i ".appVersion = \"${VERSION#v}\"" ./chart/Chart.yaml
           cat ./emby-subscription-chart/Chart.yaml
 
       - name: Set up Helm

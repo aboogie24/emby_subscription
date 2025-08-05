@@ -3,7 +3,7 @@ namespace: emby-subscription
 
 # Backend
 backend:
-  image: your-dockerhub-user/emby-backend:latest
+  image: aboogie/emby-backend:latest
   replicas: 1
   port: 8000
   env:
@@ -19,7 +19,7 @@ backend:
 
 # Frontend
 frontend:
-  image: your-dockerhub-user/emby-frontend:latest
+  image: aboogie/emby-frontend:latest
   replicas: 1
   port: 80
   env:

@@ -17,7 +17,7 @@ spec:
       - name: emby-frontend
         image: {{ .Values.frontend.image }}
         ports:
-        - containerPort: {{ .Values.frontend.port }}
+        - containerPort: 5173
         env:
         {{- range $key, $value := .Values.frontend.env }}
         - name: {{ $key }}
@@ -31,7 +31,7 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-  - port: {{ .Values.frontend.port }}
-    targetPort: {{ .Values.frontend.port }}
+  - port: 80
+    targetPort: 5173
   selector:
     app: emby-frontend

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: emby-subscription
 description: Self-hosted Emby subscription platform with Stripe intergration
-version: 0.1.2
+version: 0.1.3
 appVersion: "1.0.0"
 keywords: 
   - emby 

@@ -38,6 +38,26 @@ def send_welcome_email(to_email: str, username: str, password: str):
                     <p style="margin:5px 0;"><strong>Password:</strong> {password}</p>
                 </div>
 
+                <!-- Server Links Box -->
+                <div style="background-color:#2c2c2c; padding:15px; border-radius:6px; margin:20px 0; border:1px solid #00e676;">
+                    <h3 style="margin:0 0 10px 0; color:#00e676; font-size:16px;">🎬 Your Media Access:</h3>
+                    <p style="margin:5px 0;">
+                        <strong>Movie Server:</strong> 
+                        <a href="https://emby.justpurple.org" style="color:#00e676; text-decoration:none;">
+                            https://emby.justpurple.org
+                        </a>
+                    </p>
+                    <p style="margin:5px 0;">
+                        <strong>Request Movies:</strong> 
+                        <a href="https://jelly.justpurple.org" style="color:#00e676; text-decoration:none;">
+                            https://jelly.justpurple.org
+                        </a>
+                    </p>
+                    <p style="margin:10px 0 0 0; font-size:14px; color:#bbbbbb;">
+                        💡 Request as many movies as you would like!
+                    </p>
+                </div>
+
                 <!-- Button -->
                 <div style="text-align:center; margin:30px 0;">
                     <a href="https://emby.justpurple.org" 
@@ -60,30 +80,8 @@ def send_welcome_email(to_email: str, username: str, password: str):
     </body>
     </html>
     """
-    # html_content = f"""
-    # <html>
-    # <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-    #     <div style="max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd;">
-    #         <h2 style="text-align: center; color: #4CAF50;">Welcome to Emby</h2>
-    #         <p>Hello <strong>{username}</strong>,</p>
-    #         <p>Your Emby account has been successfully created. You can log in using the details below:</p>
-    #         <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #ccc; margin: 15px 0;">
-    #             <p><strong>Username:</strong> {username}</p>
-    #             <p><strong>Password:</strong> {password}</p>
-    #         </div>
-    #         <p style="text-align: center;">
-    #             <a href="http://emby.justpurple.org" 
-    #                style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-    #                Login to Emby
-    #             </a>
-    #         </p>
-    #         <p style="font-size: 12px; color: #666; text-align: center;">
-    #             Please change your password after your first login.
-    #         </p>
-    #     </div>
-    # </body>
-    # </html>
-    # """
+    
+    # Keep your existing body and msg setup...
     body = f"""
     Hello {username},
 
@@ -93,7 +91,10 @@ def send_welcome_email(to_email: str, username: str, password: str):
     -------------------------
     Username: {username}
     Password: {password}
-    Login URL: http://your-emby-server:8096
+    
+    Movie Server: https://emby.justpurple.org
+    Request Movies: https://jelly.justpurple.org
+    (Request as many movies as you would like!)
 
     Please change your password after logging in.
 

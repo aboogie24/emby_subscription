@@ -9,8 +9,13 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true, // keeps port consistent
-    allowedHosts: ['signup.justpurple.org'], // ✅ Allow any host
+    allowedHosts: [
+      'signup.justpurple.org',
+      'api.justpurple.org',
+      'localhost',
+      '127.0.0.1'
+    ], // ✅ Allow any host
     cors: true,
-    origin: 'https://signup.justpurple.org'
+    origin: '*'
   }
 })

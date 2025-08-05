@@ -5,7 +5,7 @@
   padding-top: 5rem; /* Account for fixed navbar */
   text-align: center;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 .logo {
@@ -86,40 +86,108 @@
   width: 100%;
   margin: 0 auto;
   position: relative;
-  z-index: 1;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .form-group {
-  margin-bottom: 2rem;
-  text-align: left;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 300px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
+  margin-right: 20px;
   color: var(--light-purple);
   font-weight: 500;
+  text-align: center;
+  width: 100%;
 }
 
 .form-group input {
-  flex: 1;
   width: 100%;
+  max-width: 300px;
+  margin-left: 15px;
   box-sizing: border-box;
-  margin-left: 30px;
-  padding: 8px 12px;
+  margin: 0 auto;
+  padding: 12px 16px;
   border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
 }
 
 .form-title {
   color: var(--accent-pink);
   text-shadow: 0 0 15px rgba(255, 119, 198, 0.4);
   margin-bottom: 1.5rem;
+  text-align: center;
+  width: 100%;
 }
 
 .form-subtitle {
   color: var(--light-purple);
   margin-bottom: 2rem;
   opacity: 0.9;
+  text-align: center;
+  display: block;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Button styling for forms */
+.form-container button {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 24px;
+  margin: 1rem auto;
+  display: block;
+  background: linear-gradient(135deg, var(--accent-pink), var(--light-purple));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.form-container button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 119, 198, 0.3);
+}
+
+/* Center all text elements in form */
+.form-container div {
+  text-align: center;
+}
+
+.form-container a {
+  color: var(--accent-pink);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.form-container a:hover {
+  color: var(--light-purple);
+}
+
+.form-container .text-muted {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.form-container .text-accent {
+  color: var(--accent-pink);
 }
 
 /* Navigation styling */

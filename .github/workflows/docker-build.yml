@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: Dev
     strategy:
       matrix:
         service: [backend, frontend]

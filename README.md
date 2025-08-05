@@ -1,4 +1,3 @@
-# Emby Subscripter Application
 # **Emby Subscription Platform**  
 
 A self‑hosted subscription management system for [Emby](https://emby.media/), built with **FastAPI** (backend) and **React + Chakra UI** (frontend).  

@@ -6,8 +6,14 @@ import Inspect from 'vite-plugin-inspect'
 export default defineConfig({
   plugins: [react(), Inspect()],
   server: {
-    host: '0.0.0.0', 
-    port: 5173, 
-    allowedHosts: ['*']
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true, // ensures consistent port
+    allowedHosts: [
+      'signup.justpurple.org',
+      'proxy.justpurple.org'
+    ],
+    cors: true,
+    origin: 'https://signup.justpurple.org'
   }
 })

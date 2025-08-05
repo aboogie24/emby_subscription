@@ -32,7 +32,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 origins = [
     "http://localhost:5173", 
     "http://127.0.0.1:5173",
-    FRONTEND_URL"
+    FRONTEND_URL
 ]
 
 print(f"DEBUG: CORS origins configured: {origins}")  # Add this line

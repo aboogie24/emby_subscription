@@ -32,8 +32,10 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 origins = [
     "http://localhost:5173", 
     "http://127.0.0.1:5173",
-    f"{FRONTEND_URL}"
+    FRONTEND_URL"
 ]
+
+print(f"DEBUG: CORS origins configured: {origins}")  # Add this line
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +44,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def debug_cors(request: Request, call_next):
+    origin = request.headers.get("origin")
+    print(f"DEBUG: Incoming request from origin: {origin}")
+    print(f"DEBUG: Method: {request.method}, Path: {request.url.path}")
+    response = await call_next(request)
+    print(f"DEBUG: Response status: {response.status_code}")
+    return response
 
 
 @app.post("logout")

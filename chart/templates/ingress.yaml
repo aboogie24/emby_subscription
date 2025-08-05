@@ -21,7 +21,8 @@ spec:
             name: emby-backend
             port: 
               number: {{ .Values.backend.port }}
-  - host: "api-"{{ .Values.ingress.host }}
+              
+  - host: "api.{{ .Values.ingress.host }}"
     http:
       paths:
       - path: /

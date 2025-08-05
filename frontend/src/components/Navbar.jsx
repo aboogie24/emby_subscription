@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { Box, Flex, Link, Heading, Button } from "@chakra-ui/react";
 import axios from "axios";
 
 export default function Navbar() {
@@ -33,28 +32,72 @@ export default function Navbar() {
   };
 
   return (
-    <Box bg="gray.900" px={4} py={3}>
-      <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-        <Heading size="md" color="green.400">Emby Portal</Heading>
-        <Flex alignItems={"center"}>
+    <nav className="nav-container" style={{ 
+      position: "fixed", 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      zIndex: 1000,
+      padding: "1rem 2rem"
+    }}>
+      <div style={{ 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "space-between",
+        maxWidth: "1200px",
+        margin: "0 auto"
+      }}>
+        <h2 style={{ 
+          color: "var(--accent-pink)", 
+          margin: 0,
+          textShadow: "0 0 15px rgba(255, 119, 198, 0.4)",
+          fontSize: "1.5rem"
+        }}>
+          🌌 Emby Portal
+        </h2>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           {!isLoggedIn ? (
             <>
-              <Link as={RouterLink} to="/" color="white" px={3}>Signup</Link>
-              <Link as={RouterLink} to="/login" color="white" px={3}>Login</Link>
+              <RouterLink to="/" className="nav-link">
+                Signup
+              </RouterLink>
+              <RouterLink to="/login" className="nav-link">
+                Login
+              </RouterLink>
             </>
           ) : (
             <>
-              <Link as={RouterLink} to="/account" color="white" px={3}>Account</Link>
-              <Button onClick={handleLogout} size="sm" colorScheme="red" ml={2}>
+              <RouterLink to="/account" className="nav-link">
+                Account
+              </RouterLink>
+              <button 
+                onClick={handleLogout}
+                style={{ 
+                  padding: "0.4rem 0.8rem",
+                  fontSize: "0.9rem",
+                  background: "linear-gradient(135deg, #dc2626, #ef4444)",
+                  border: "1px solid #dc2626"
+                }}
+              >
                 Logout
-              </Button>
-              <Button onClick={checkDebugToken} size="sm" colorScheme="yellow" ml={2}>
-                Debug Token
-              </Button>
+              </button>
+              <button 
+                onClick={checkDebugToken}
+                style={{ 
+                  padding: "0.4rem 0.8rem",
+                  fontSize: "0.9rem",
+                  background: "linear-gradient(135deg, #ca8a04, #eab308)",
+                  border: "1px solid #ca8a04",
+                  color: "#000"
+                }}
+              >
+                Debug
+              </button>
             </>
           )}
-        </Flex>
-      </Flex>
-    </Box>
+        </div>
+      </div>
+    </nav>
   );
 }

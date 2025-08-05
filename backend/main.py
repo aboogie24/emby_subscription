@@ -219,8 +219,8 @@ def signup(data: dict):
             {"price": STRIPE_PRICE_ID, "quantity": 1}
         ],
         mode="subscription",
-        success_url="https://yourdomain.com/success?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url="https://yourdomain.com/cancel",
+        success_url=f"https://api.justpurple.org/success?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url=F"https://api.justpurple.org/cancel",
     )
 
     # Save user as pending

@@ -15,9 +15,5 @@ JWT_EXPIRATION_MINUTES = int(os.getenv("JWT_EXPIRATION_MINUTES", 60))
 DATABASE_URL = os.getenv("DATABASE_URL")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
-SMTP_SERVER = "sandbox.smtp.mailtrap.io"
-SMTP_PORT = 587  # usually 587 for TLS, 465 for SSL
-SMTP_USERNAME = "20db3ec6a6b663"
-SMTP_PASSWORD = "83b2f0f6d44ed7"
-FROM_EMAIL = "noreply@yourdomain.com"
+
 

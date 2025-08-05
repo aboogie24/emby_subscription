@@ -147,7 +147,7 @@ def account(access_token: str = Cookie(None)):
 
     print(f"username: {sub.emby_username}" +
             f"status: {sub.status}" +
-            f"billing_portal_url"
+            f"billing_portal_url: {billing_portal_url}"
     )
 
     return {

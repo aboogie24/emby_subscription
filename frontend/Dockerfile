@@ -10,7 +10,7 @@ RUN rm -rf node_modules package-lock.json
 RUN npm cache clean --force
 
 # Install with explicit ARM64 support
-RUN npm install --platform=linux --arch=arm64
+RUN npm install
 
 # Manually ensure rollup ARM64 binary is installed
 RUN npm install @rollup/rollup-linux-arm64-gnu --save-optional || true

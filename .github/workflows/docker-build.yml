@@ -36,6 +36,7 @@ jobs:
           context: ./${{ matrix.service }}
           file: ./${{ matrix.service }}/Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64 
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}

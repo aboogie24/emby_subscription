@@ -32,6 +32,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 origins = [
     "http://localhost:5173", 
     "http://127.0.0.1:5173",
+    f"{FRONTEND_URL}"
 ]
 
 app.add_middleware(
@@ -113,7 +114,7 @@ def account(access_token: str = Cookie(None)):
     if sub.stripe_customer_id:
         session_obj = stripe.billing_portal.Session.create(
             customer=sub.stripe_customer_id,
-            return_url="http://localhost:5173/account"
+            return_url=F"{FRONTEND_URL}/account"
         )
         billing_portal_url = session_obj.url
 

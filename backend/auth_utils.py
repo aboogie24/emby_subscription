@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")   # Change this to a secure value
-JWT_ALGORITHM = os.getenv("JWt_ALGORITHM") 
-JWT_EXPIRATION_MINUTES = os.getenv("JWT_EXPIRATION_MINUTES") 
+JWT_ALGORITHM = os.getenv("JWt_ALGORITHM", "HS256") 
+JWT_EXPIRATION_MINUTES = int(os.getenv("JWT_EXPIRATION_MINUTES", 60))
 
 def create_access_token(data: dict):
     to_encode = data.copy()

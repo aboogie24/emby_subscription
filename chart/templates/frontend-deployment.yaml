@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: emby-frontend
-        image: {{ .Values.frontend.image }}
+        image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
         ports:
         - containerPort: 5173
         env:

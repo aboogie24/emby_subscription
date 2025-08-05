@@ -9,11 +9,12 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true, // ensures consistent port
-    allowedHosts: [
-      'signup.justpurple.org',
-      'proxy.justpurple.org'
-    ],
+    allowedHosts: process.env.VITE_ALLOWED_HOSTS
+      ? process.env.VITE_ALLOWED_HOSTS.split(',')
+      : ['localhost'],
     cors: true,
-    origin: 'https://signup.justpurple.org'
+    origin: process.env.VITE_ALLOWED_HOSTS?.split(',')[0]
+      ? `https://${process.env.VITE_ALLOWED_HOSTS.split(',')[0]}`
+      : undefined
   }
 })

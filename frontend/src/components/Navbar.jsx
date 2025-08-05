@@ -71,29 +71,7 @@ export default function Navbar() {
               <RouterLink to="/account" className="nav-link">
                 Account
               </RouterLink>
-              <button 
-                onClick={handleLogout}
-                style={{ 
-                  padding: "0.4rem 0.8rem",
-                  fontSize: "0.9rem",
-                  background: "linear-gradient(135deg, #dc2626, #ef4444)",
-                  border: "1px solid #dc2626"
-                }}
-              >
-                Logout
-              </button>
-              <button 
-                onClick={checkDebugToken}
-                style={{ 
-                  padding: "0.4rem 0.8rem",
-                  fontSize: "0.9rem",
-                  background: "linear-gradient(135deg, #ca8a04, #eab308)",
-                  border: "1px solid #ca8a04",
-                  color: "#000"
-                }}
-              >
-                Debug
-              </button>
+        
             </>
           )}
         </div>

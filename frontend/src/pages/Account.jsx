@@ -5,6 +5,7 @@ import axios from "axios";
 export default function Account() {
   const [account, setAccount] = useState(null);
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/account`, {
@@ -16,6 +17,12 @@ export default function Account() {
       navigate("/login");
     }); 
   }, [navigate]);
+
+  const handleLogout = async () => {
+    await axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, { withCredentials: true });
+    setIsLoggedIn(false);
+    navigate("/login");
+  };
 
   if (!account) {
     return (
@@ -67,7 +74,7 @@ export default function Account() {
         )}
         
         <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
-          <a href="/login" className="text-muted" style={{ textDecoration: "none" }}>
+          <a href="/login" onClick={handleLogout} className="text-muted" style={{ textDecoration: "none" }}>
             Sign out
           </a>
         </div>

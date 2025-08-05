@@ -76,6 +76,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     username = form_data.username
     password = form_data.password
 
+    if not username:
+        raise HTTPException(status_code=400, detail="Username is missing")
+    
+    if not password:
+        raise HTTPException(status_code=400, detail="Password is missing")
+    
     # Authenticate with Emby API
     url = f"{EMBY_SERVER_URL}/emby/Users/AuthenticateByName"
     headers = {

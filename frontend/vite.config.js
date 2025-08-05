@@ -5,4 +5,9 @@ import Inspect from 'vite-plugin-inspect'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), Inspect()],
+  server: {
+    host: '0.0.0.0', 
+    port: 5173, 
+    allowedHosts: ['*']
+  }
 })

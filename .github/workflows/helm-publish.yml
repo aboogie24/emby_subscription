@@ -21,8 +21,8 @@ jobs:
 
       - name: Package Helm chart
         run: |
-          helm lint ./emby-subscription-chart
-          helm package ./emby-subscription-chart --destination packaged
+          helm lint ./chart
+          helm package ./chart --destination packaged
 
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3

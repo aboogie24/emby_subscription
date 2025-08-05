@@ -12,13 +12,6 @@ spec:
   - host: {{ .Values.ingress.host }}
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: emby-frontend
-            port:
-              number: {{ .Values.frontend.port }}
       - path: /api(/|$)(.*)
         pathType: Prefix
         backend: 
@@ -26,4 +19,11 @@ spec:
             name: emby-backend
             port: 
               number: {{ .Values.backend.port }}
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: emby-frontend
+            port:
+              number: {{ .Values.frontend.port }}
 {{- end }}

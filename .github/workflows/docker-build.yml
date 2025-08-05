@@ -58,6 +58,14 @@ jobs:
       - name: Extract Version from Tag
         id: vars
         run: |
+          REF="${GITHUB_REF}"
+          echo "Ref is $REF"
+
+          if [[ "$REF" == "refs/heads/main" ]]; then
+            echo "Push to main branch detected - skipping release."
+            exit 0 
+          fi
+          
           VERSION="${GITHUB_REF#refs/tags/}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "Chart version will be set to $VERSION"

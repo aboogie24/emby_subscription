@@ -12,24 +12,26 @@ export default function Navbar() {
       .catch(() => setIsLoggedIn(false));
   }, []);
 
-  const checkDebugToken = async () => {
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/debug-token`, {
-        withCredentials: true
-      });
-      alert(`Decoded user: ${res.data.decoded_username || "No token"}`);
-      console.log("Debug Token Response:", res.data);
-    } catch (err) {
-      alert("Debug failed");
-      console.error("Debug Token Error:", err.response?.data || err.message);
-    }
-  };
+  console.log(isLoggedIn);
 
-  const handleLogout = async () => {
-    await axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, { withCredentials: true });
-    setIsLoggedIn(false);
-    navigate("/login");
-  };
+  // const checkDebugToken = async () => {
+  //   try {
+  //     const res = await axios.get(`${import.meta.env.VITE_API_URL}/debug-token`, {
+  //       withCredentials: true
+  //     });
+  //     alert(`Decoded user: ${res.data.decoded_username || "No token"}`);
+  //     console.log("Debug Token Response:", res.data);
+  //   } catch (err) {
+  //     alert("Debug failed");
+  //     console.error("Debug Token Error:", err.response?.data || err.message);
+  //   }
+  // };
+
+  // const handleLogout = async () => {
+  //   await axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, { withCredentials: true });
+  //   setIsLoggedIn(false);
+  //   navigate("/login");
+  // };
 
   return (
     <nav className="nav-container" style={{ 
@@ -71,7 +73,6 @@ export default function Navbar() {
               <RouterLink to="/account" className="nav-link">
                 Account
               </RouterLink>
-        
             </>
           )}
         </div>

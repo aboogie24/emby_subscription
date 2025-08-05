@@ -21,6 +21,13 @@ spec:
             name: emby-backend
             port: 
               number: {{ .Values.backend.port }}
+      - path: /webhook
+        pathType: Prefix
+        backend: 
+          service: 
+            name: emby-backend
+            port: 
+              number: {{ .Values.backend.port }}
               
   - host: {{ .Values.ingress.host }}
     http:

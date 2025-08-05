@@ -33,6 +33,7 @@ def set_emby_user_status(user_id: str, is_disabled: bool):
         "IsDisabled": is_disabled
     }
     r = requests.post(url, headers=headers, json=payload)
+    print(r.status_code, r.text)
     return r.status_code, r.text
 
 def get_emby_user_id(username: str):

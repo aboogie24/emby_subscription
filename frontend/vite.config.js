@@ -8,13 +8,9 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    strictPort: true, // ensures consistent port
-    allowedHosts: process.env.VITE_ALLOWED_HOSTS
-      ? process.env.VITE_ALLOWED_HOSTS.split(',')
-      : ['localhost'],
+    strictPort: true, // keeps port consistent
+    allowedHosts: ['*'], // ✅ Allow any host
     cors: true,
-    origin: process.env.VITE_ALLOWED_HOSTS?.split(',')[0]
-      ? `https://${process.env.VITE_ALLOWED_HOSTS.split(',')[0]}`
-      : undefined
+    origin: '*'
   }
 })

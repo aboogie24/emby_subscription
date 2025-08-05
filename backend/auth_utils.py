@@ -17,6 +17,9 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 def verify_access_token(token: str):
+    if not token:
+        print("Token is None or empty", flush=True)
+        return None
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         username = payload.get("sub")

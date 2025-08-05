@@ -44,14 +44,14 @@ app.add_middleware(
 )
 
 
-@app.post("/logout")
+@app.post("/api/logout")
 def logout():
     response = JSONResponse(content={"message": "Logged out successfully"})
     response.delete_cookie(key="access_token")
     return response
 
 
-@app.post("/login")
+@app.post("/api/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     username = form_data.username
     password = form_data.password
@@ -86,7 +86,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return response
 
 
-@app.get("/debug-token")
+@app.get("/api/debug-token")
 def debug_token(access_token: str = Cookie(None)):
     print("🔍 Raw token from cookie:", access_token, flush=True)
     username = verify_access_token(access_token)
@@ -94,7 +94,7 @@ def debug_token(access_token: str = Cookie(None)):
     return {"raw_token": access_token, "decoded_username": username}
 
 
-@app.get("/account")
+@app.get("/api/account")
 def account(access_token: str = Cookie(None)):
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -154,7 +154,7 @@ def account(access_token: str = Cookie(None)):
 #         "billing_portal_url": billing_portal_url
 #     }
 
-@app.post("/signup")
+@app.post("/api/signup")
 def signup(data: dict):
     """
     Expects:

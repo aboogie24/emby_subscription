@@ -55,6 +55,15 @@ async def debug_cors(request: Request, call_next):
     return response
 
 
+@app.on_event("startup")
+async def startup_event():
+    print("=== REGISTERED ROUTES ===")
+    for route in app.routes:
+        if hasattr(route, 'methods'):
+            print(f"{route.methods} {route.path}")
+    print("========================")
+
+
 @app.post("/logout")
 def logout():
     response = JSONResponse(content={"message": "Logged out successfully"})

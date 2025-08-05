@@ -1,0 +1,33 @@
+# Global
+namespace: emby-subscription
+
+# Backend
+backend:
+  image: your-dockerhub-user/emby-backend:latest
+  replicas: 1
+  port: 8000
+  env:
+    STRIPE_API_KEY: "sk_test_replace"
+    STRIPE_WEBHOOK_SECRET: "whsec_replace"
+    EMBY_API_KEY: "replace"
+    EMBY_SERVER_URL: "http://emby:8096"
+    JWT_SECRET_KEY: "replace"
+    JWT_ALGORITHM: "HS256"
+    JWT_EXPIRATION_MINUTES: "60"
+    DATABASE_URL: "sqlite:///./subscriptions.db"
+    FRONTEND_URL: "http://localhost:5173"
+
+# Frontend
+frontend:
+  image: your-dockerhub-user/emby-frontend:latest
+  replicas: 1
+  port: 80
+  env:
+    VITE_API_URL: "http://emby-backend:8000"
+
+# Ingress
+ingress:
+  enabled: true
+  host: emby.yourdomain.com
+  tls:
+    enabled: false

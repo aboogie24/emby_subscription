@@ -1,0 +1,15 @@
+apiVersion: v2
+name: emby-subscription
+description: Self-hosted Emby subscription platform with Stripe intergration
+version: 0.1.0
+appVersion: "1.0.0"
+keywords: 
+  - emby 
+  - stripe 
+  - subscriptions
+home: https://github.com/aboogie24/emby_subscription
+sources: 
+  - https://github.com/aboogie24/emby_subscription
+maintainers:  
+  - name: Alfred Brown
+    email: alfred.brown@alfredbrowniii.io

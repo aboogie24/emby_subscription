@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emby-frontend
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: emby-frontend
+  template:
+    metadata:
+      labels:
+        app: emby-frontend
+    spec:
+      containers:
+      - name: emby-frontend
+        image: {{ .Values.frontend.image }}
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+        env:
+        {{- range $key, $value := .Values.frontend.env }}
+        - name: {{ $key }}
+          value: "{{ $value }}"
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emby-frontend
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: {{ .Values.frontend.port }}
+    targetPort: {{ .Values.frontend.port }}
+  selector:
+    app: emby-frontend

@@ -19,4 +19,11 @@ spec:
             name: emby-frontend
             port:
               number: {{ .Values.frontend.port }}
+      - path: /api(/|$)(.*)
+        pathType: Prefix
+        backend: 
+          service: 
+            name: emby-backend
+            port: 
+              number: {{ .Values.backend.port }}
 {{- end }}

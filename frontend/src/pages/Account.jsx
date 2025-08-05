@@ -10,7 +10,7 @@ export default function Account() {
 
   useEffect(() => {
 
-    axios.get("http://localhost:8000/account", {
+    axios.get(`${import.meta.env.VITE_API_URL}/account`, {
       withCredentials: true 
     })
     .then(res => setAccount(res.data))

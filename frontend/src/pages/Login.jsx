@@ -14,7 +14,7 @@ export default function Login() {
       formData.append("username", username);
       formData.append("password", password);
 
-      const res = await axios.post("http://localhost:8000/login", formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, formData, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         withCredentials: true // Allow cookies
       });

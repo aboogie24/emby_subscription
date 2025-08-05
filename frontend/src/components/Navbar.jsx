@@ -8,14 +8,14 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/debug-token", { withCredentials: true })
+    axios.get(`${import.meta.env.VITE_API_URL}/debug-token`, { withCredentials: true })
       .then(() => setIsLoggedIn(true))
       .catch(() => setIsLoggedIn(false));
   }, []);
 
   const checkDebugToken = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/debug-token", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/debug-token`, {
         withCredentials: true
       });
       alert(`Decoded user: ${res.data.decoded_username || "No token"}`);
@@ -27,7 +27,7 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    await axios.post("http://localhost:8000/logout", {}, { withCredentials: true });
+    await axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, { withCredentials: true });
     setIsLoggedIn(false);
     navigate("/login");
   };

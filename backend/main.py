@@ -100,7 +100,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # change to True in production (HTTPS)
+        secure=True,  # change to True in production (HTTPS)
         samesite="Lax",
         max_age=60*60
     )

@@ -12,6 +12,7 @@ export default function Signup() {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, {
         username, email
       });
+      print(res.data.checkout_url)
       if (res.data.checkout_url) {
         window.location.href = res.data.checkout_url;
       } else if (res.status === 200) {

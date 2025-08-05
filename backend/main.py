@@ -145,6 +145,12 @@ def account(access_token: str = Cookie(None)):
         )
         billing_portal_url = session_obj.url
 
+    print(f"username: {sub.emby_username}" +
+            f"status: {sub.status}" +
+            f"expiry_date: {sub.expiry_date.strftime("%Y-%m-%d") if sub.expiry_date else None}" +
+            f"billing_portal_url"
+    )
+
     return {
         "username": sub.emby_username,
         "status": sub.status,

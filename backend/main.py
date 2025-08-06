@@ -239,6 +239,9 @@ def signup(data: dict):
 
 @app.post("/webhook")
 async def stripe_webhook(request: Request):
+    print(f"🔔 Webhook endpoint hit - Method: {request.method}")
+    print(f"🔔 Headers: {dict(request.headers)}")
+    print(f"🔔 URL: {request.url}")
     return await handle_webhook(request)
 
 @app.get("/")

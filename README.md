@@ -51,6 +51,73 @@ emby-subscription/
 
 ---
 
+## **☸️ Kubernetes Deployment with Helm**
+
+The project includes a Helm chart for Kubernetes deployment with persistent storage support.
+
+### **Chart Structure**
+```
+chart/
+├── Chart.yaml
+├── values.yaml
+└── templates/
+    ├── backend-deployment.yaml
+    ├── backend-pvc.yaml
+    ├── frontend-deployment.yaml
+    └── ingress.yaml
+```
+
+### **Persistence Configuration**
+
+The backend deployment supports persistent storage for the SQLite database:
+
+```yaml
+# In values.yaml
+backend:
+  persistence:
+    enabled: true          # Enable/disable persistence
+    size: 1Gi             # Storage size
+    mountPath: /app        # Mount path in container
+    accessModes:
+      - ReadWriteOnce      # Access mode
+    storageClass: ""       # Storage class (empty = default)
+    annotations: {}        # Additional annotations
+```
+
+### **Deployment Commands**
+
+```bash
+# Install the chart
+helm install emby-subscription ./chart
+
+# Upgrade the chart
+helm upgrade emby-subscription ./chart
+
+# Uninstall the chart
+helm uninstall emby-subscription
+```
+
+### **Customizing Values**
+
+Create a custom values file:
+
+```bash
+# custom-values.yaml
+backend:
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: "fast-ssd"
+  env:
+    STRIPE_API_KEY: "your_actual_stripe_key"
+    EMBY_API_KEY: "your_actual_emby_key"
+
+# Deploy with custom values
+helm install emby-subscription ./chart -f custom-values.yaml
+```
+
+---
+
 ## **⚙️ Environment Variables**
 
 ### **Backend (`backend/.env`)**

@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from stripe_webhooks import handle_webhook
 from database import SessionLocal, Subscription
 import stripe
+from stripe.error import InvalidRequestError
 from email_utils import send_welcome_email
 from emby import create_emby_user
 from auth_utils import create_access_token, verify_access_token
@@ -139,11 +140,16 @@ def account(access_token: str = Cookie(None)):
     # Generate Stripe Customer Portal URL (optional, if stripe_customer_id exists)
     billing_portal_url = None
     if sub.stripe_customer_id:
-        session_obj = stripe.billing_portal.Session.create(
-            customer=sub.stripe_customer_id,
-            return_url=F"{FRONTEND_URL}/account"
-        )
-        billing_portal_url = session_obj.url
+        try:
+            session_obj = stripe.billing_portal.Session.create(
+                customer=sub.stripe_customer_id,
+                return_url=F"{FRONTEND_URL}/account"
+            )
+            billing_portal_url = session_obj.url
+        except stripe.error.InvalidRequestError as e:
+            print(f"⚠️ Stripe billing portal error: {str(e)}")
+            print("💡 Please configure your customer portal at: https://dashboard.stripe.com/settings/billing/portal")
+            # billing_portal_url remains None, which is handled gracefully by the frontend
 
     print(f"username: {sub.emby_username}" +
             f"status: {sub.status}" +

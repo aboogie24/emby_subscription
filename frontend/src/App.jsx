@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Signup from "./pages/Signup";
 import Account from "./pages/Account";
-import Login from "./pages/Login"; 
+import Login from "./pages/Login";
+import SetupInfo from "./pages/SetupInfo";
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} /> 
         <Route path="/account" element={<Account />} />
+        <Route path="/setup" element={<SetupInfo />} />
       </Routes>
     </Router>
   );

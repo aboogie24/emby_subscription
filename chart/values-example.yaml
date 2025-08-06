@@ -1,0 +1,68 @@
+# Example values file for Emby Subscription Platform
+# Copy this file and customize it for your deployment:
+# helm install emby-subscription ./chart -f your-custom-values.yaml
+
+# Global
+namespace: emby-subscription
+domain: your-domain.com
+
+# Backend Configuration
+backend:
+  image: 
+    repository: aboogie/emby-backend
+    tag: v0.0.0
+  replicas: 1
+  port: 8000
+  
+  # Environment Variables - CUSTOMIZE THESE!
+  env:
+    STRIPE_API_KEY: "sk_live_your_actual_stripe_key"
+    STRIPE_WEBHOOK_SECRET: "whsec_your_actual_webhook_secret"
+    EMBY_API_KEY: "your_actual_emby_api_key"
+    EMBY_SERVER_URL: "https://your-emby-server.com:8096"
+    JWT_SECRET_KEY: "your_super_secret_jwt_key_change_this"
+    JWT_ALGORITHM: "HS256"
+    JWT_EXPIRATION_MINUTES: "60"
+    DATABASE_URL: "sqlite:///./subscriptions.db"
+    FRONTEND_URL: "https://your-domain.com"
+    SMTP_SERVER: "your-smtp-server.com"
+    SMTP_PORT: 587
+    SMTP_USERNAME: "your_smtp_username"
+    SMTP_PASSWORD: "your_smtp_password"
+    FROM_EMAIL: "noreply@your-domain.com"
+  
+  # Persistence Configuration
+  persistence:
+    enabled: true
+    size: 5Gi                    # Increase size for production
+    mountPath: /app
+    accessModes:
+      - ReadWriteOnce
+    storageClass: "fast-ssd"     # Use your preferred storage class
+    annotations: {}
+
+# Frontend Configuration
+frontend:
+  image: 
+    repository: aboogie/emby-frontend
+    tag: v0.0.0
+  replicas: 2                    # Scale for production
+  port: 5173
+  env:
+    VITE_API_URL: "https://your-domain.com/api"
+    VITE_ALLOWED_HOSTS: "your-domain.com"
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  host: your-domain.com
+  className: nginx
+  annotations: 
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # For SSL certificates
+  tls:
+    enabled: true
+    secretName: "emby-subscription-tls"

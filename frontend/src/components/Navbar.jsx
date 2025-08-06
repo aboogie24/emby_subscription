@@ -59,6 +59,9 @@ export default function Navbar() {
         </h2>
         
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <RouterLink to="/setup" className="nav-link">
+            📖 Setup Guide
+          </RouterLink>
           {!isLoggedIn ? (
             <>
               <RouterLink to="/" className="nav-link">

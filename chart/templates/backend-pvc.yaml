@@ -1,0 +1,26 @@
+{{- if .Values.backend.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: emby-backend-pvc
+  namespace: {{ .Values.namespace }}
+  {{- if .Values.backend.persistence.annotations }}
+  annotations:
+    {{- toYaml .Values.backend.persistence.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- range .Values.backend.persistence.accessModes }}
+    - {{ . | quote }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.backend.persistence.size | quote }}
+  {{- if .Values.backend.persistence.storageClass }}
+  {{- if (eq "-" .Values.backend.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.backend.persistence.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+{{- end }}

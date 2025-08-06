@@ -191,8 +191,8 @@ export default function SetupInfo() {
                   <span>Enter your server details:</span>
                 </div>
                 <div style={{ marginLeft: "2.5rem", color: "rgba(255, 255, 255, 0.8)" }}>
-                  <p style={{ margin: "0.25rem 0" }}>• <strong>Server Address:</strong> Your Emby server URL</p>
-                  <p style={{ margin: "0.25rem 0" }}>• <strong>Port:</strong> Usually 8096 (HTTP) or 8920 (HTTPS)</p>
+                  <p style={{ margin: "0.25rem 0" }}>• <strong>Server Address:</strong> https://emby.justpurple.org</p>
+                  <p style={{ margin: "0.25rem 0" }}>• <strong>Port:</strong> 443</p>
                 </div>
               </div>
               <div style={{ 
@@ -395,7 +395,7 @@ export default function SetupInfo() {
                   Access all your series and episodes with progress tracking
                 </p>
               </div>
-              <div style={{ 
+              {/* <div style={{ 
                 background: "rgba(255, 255, 255, 0.05)",
                 padding: "1.5rem",
                 borderRadius: "10px",
@@ -406,7 +406,7 @@ export default function SetupInfo() {
                 <p style={{ margin: 0, color: "rgba(255, 255, 255, 0.8)", fontSize: "0.9rem" }}>
                   Listen to your music library with playlists and lyrics
                 </p>
-              </div>
+              </div> */}
               <div style={{ 
                 background: "rgba(255, 255, 255, 0.05)",
                 padding: "1.5rem",

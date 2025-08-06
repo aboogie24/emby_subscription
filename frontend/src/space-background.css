@@ -198,3 +198,105 @@
   0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
   100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
 }
+
+/* Mobile optimizations for space background */
+@media (max-width: 768px) {
+  .space-background {
+    background-size: 100% 100%;
+  }
+  
+  .space-background::before {
+    background-size: 150px 80px;
+    animation-duration: 15s;
+  }
+  
+  .space-background::after {
+    background-size: 120px 90px;
+    animation-duration: 18s;
+  }
+  
+  .space-planet {
+    width: 100px;
+    height: 100px;
+    top: 5%;
+    right: 5%;
+  }
+  
+  .space-planet::before {
+    width: 120px;
+    height: 15px;
+  }
+  
+  .particle {
+    animation-duration: 12s !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .space-background::before {
+    background-size: 100px 60px;
+    animation-duration: 12s;
+  }
+  
+  .space-background::after {
+    background-size: 80px 70px;
+    animation-duration: 15s;
+  }
+  
+  .space-planet {
+    width: 80px;
+    height: 80px;
+    top: 3%;
+    right: 3%;
+  }
+  
+  .space-planet::before {
+    width: 100px;
+    height: 12px;
+  }
+  
+  .particle {
+    animation-duration: 10s !important;
+  }
+  
+  /* Reduce particle count on very small screens for performance */
+  .particle:nth-child(n+6) {
+    display: none;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .space-background::before,
+  .space-background::after {
+    animation: none;
+  }
+  
+  .space-planet {
+    animation: none;
+  }
+  
+  .space-planet::before {
+    animation: none;
+  }
+  
+  .particle {
+    animation: none;
+    opacity: 0.3;
+  }
+}
+
+/* Performance optimizations for mobile */
+@media (max-width: 768px) {
+  .space-background,
+  .space-background::before,
+  .space-background::after {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
+  .space-planet {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+}

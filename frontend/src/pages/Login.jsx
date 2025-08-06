@@ -19,6 +19,8 @@ export default function Login() {
       });
 
       console.log("Login response:", res.data);
+      // Dispatch custom event to notify navbar of login success
+      window.dispatchEvent(new Event('loginSuccess'));
       setTimeout(() => navigate("/account"), 100);
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message); 

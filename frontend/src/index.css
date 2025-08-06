@@ -168,6 +168,72 @@ input::placeholder, textarea::placeholder {
   color: var(--primary-purple);
 }
 
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+  body {
+    min-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-size: 2.5em;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 1.8em;
+  }
+
+  h3 {
+    font-size: 1.4em;
+  }
+
+  button {
+    padding: 0.8em 1.5em;
+    font-size: 1.1em;
+    min-height: 44px; /* Touch-friendly minimum size */
+  }
+
+  input, textarea, select {
+    padding: 1em 1.2em;
+    font-size: 1.1em;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .card, .container {
+    padding: 1.5em;
+    margin: 1rem;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  button {
+    width: 100%;
+    padding: 1em;
+    font-size: 1.1em;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .card, .container {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+}
+
 /* Remove light mode styles since we're going full space theme */
 @media (prefers-color-scheme: light) {
   :root {

@@ -260,19 +260,126 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive design */
+/* Mobile responsive design - desktop remains unchanged */
 @media (max-width: 768px) {
   #root {
     padding: 1rem;
+    padding-top: 6rem; /* Account for mobile navbar height */
+    max-width: 100%;
   }
   
   .form-container {
     padding: 1.5em;
     margin: 1rem;
+    max-width: 100%;
+    width: calc(100% - 2rem);
+  }
+  
+  .form-group {
+    max-width: 100%;
+  }
+  
+  .form-group input {
+    max-width: 100%;
+    width: 100%;
+    margin-left: 0;
+    box-sizing: border-box;
   }
   
   .card {
     padding: 1.5em;
+    margin: 1rem;
+  }
+  
+  .logo {
+    height: 4em;
+    padding: 1em;
+  }
+  
+  /* Mobile navbar adjustments */
+  .nav-container {
+    padding: 0.5rem 1rem !important;
+  }
+  
+  .nav-link {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .nav-container h2 {
+    font-size: 1.2rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #root {
+    padding: 0.5rem;
+    padding-top: 5.5rem;
+  }
+  
+  .form-container {
+    padding: 1rem;
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group input {
+    width: 100%;
+    margin: 0;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .form-container button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .card {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  .logo {
+    height: 3em;
+    padding: 0.5em;
+  }
+  
+  /* Small screen navbar */
+  .nav-container {
+    padding: 0.5rem !important;
+  }
+  
+  .nav-container h2 {
+    font-size: 1rem !important;
+  }
+  
+  .nav-link {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  button {
+    min-height: 44px; /* Apple's recommended touch target size */
+  }
+  
+  .nav-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  
+  input, textarea, select {
+    min-height: 44px;
   }
 }
 

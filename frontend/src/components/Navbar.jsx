@@ -6,10 +6,46 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
+  const checkAuthStatus = () => {
     axios.get(`${import.meta.env.VITE_API_URL}/debug-token`, { withCredentials: true })
       .then(() => setIsLoggedIn(true))
       .catch(() => setIsLoggedIn(false));
+  };
+
+  useEffect(() => {
+    checkAuthStatus();
+    
+    // Listen for storage events (when login happens in another tab/window)
+    const handleStorageChange = () => {
+      checkAuthStatus();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check auth status when the window gains focus
+    const handleFocus = () => {
+      checkAuthStatus();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
+  // Listen for custom login events
+  useEffect(() => {
+    const handleLoginSuccess = () => {
+      checkAuthStatus();
+    };
+    
+    window.addEventListener('loginSuccess', handleLoginSuccess);
+    
+    return () => {
+      window.removeEventListener('loginSuccess', handleLoginSuccess);
+    };
   }, []);
 
   console.log(isLoggedIn);
@@ -58,7 +94,13 @@ export default function Navbar() {
           🌌 Emby Portal
         </h2>
         
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "1rem",
+          flexWrap: "wrap",
+          justifyContent: "center"
+        }}>
           <RouterLink to="/setup" className="nav-link">
             📖 Setup Guide
           </RouterLink>

@@ -9,6 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all backend files
 COPY . .
 
+# Create data directory for persistent storage
+RUN mkdir -p /app/data
+
 # Ensure we're in the right directory and main.py exists
 RUN ls -la /app && test -f /app/main.py
 

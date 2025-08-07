@@ -55,6 +55,15 @@ export default function Account() {
               {account.status}
             </p>
           </div>
+
+          {account.plan_name && (
+            <div style={{ marginBottom: "1rem" }}>
+              <h3 style={{ color: "var(--light-purple)", marginBottom: "0.5rem" }}>Current Plan</h3>
+              <p style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: "1.1rem" }}>
+                {account.plan_name}
+              </p>
+            </div>
+          )}
           
           <div style={{ marginBottom: "1rem" }}>
             <h3 style={{ color: "var(--light-purple)", marginBottom: "0.5rem" }}>Next Renewal</h3>

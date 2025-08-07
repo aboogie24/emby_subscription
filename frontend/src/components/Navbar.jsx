@@ -76,7 +76,8 @@ export default function Navbar() {
       left: 0, 
       right: 0, 
       zIndex: 1000,
-      padding: "1rem 2rem"
+      padding: "0.5rem 2rem",
+      height: "60px"
     }}>
       <div style={{ 
         display: "flex", 
@@ -85,40 +86,172 @@ export default function Navbar() {
         maxWidth: "1200px",
         margin: "0 auto"
       }}>
-        <h2 style={{ 
-          color: "var(--accent-pink)", 
-          margin: 0,
-          textShadow: "0 0 15px rgba(255, 119, 198, 0.4)",
-          fontSize: "1.5rem"
-        }}>
-          🌌 Emby Portal
-        </h2>
+        <RouterLink 
+          to="/" 
+          style={{ 
+            fontSize: "28px",
+            fontWeight: 800,
+            background: "linear-gradient(45deg, #e879f9, #a855f7, #3b82f6)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            textDecoration: "none",
+            cursor: "pointer",
+            transition: "all 0.3s ease"
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+          }}
+        >
+          EMBY GALAXY
+        </RouterLink>
         
         <div style={{ 
           display: "flex", 
           alignItems: "center", 
-          gap: "1rem",
-          flexWrap: "wrap",
-          justifyContent: "center"
+          gap: "30px",
+          flexWrap: "wrap"
         }}>
-          <RouterLink to="/setup" className="nav-link">
-            📖 Setup Guide
+          <a 
+            href="#features"
+            style={{
+              color: "rgba(255, 255, 255, 0.8)",
+              textDecoration: "none",
+              fontWeight: 500,
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = "#e879f9";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Features
+          </a>
+          <a 
+            href="#pricing"
+            style={{
+              color: "rgba(255, 255, 255, 0.8)",
+              textDecoration: "none",
+              fontWeight: 500,
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = "#e879f9";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Pricing
+          </a>
+          <a 
+            href="#support"
+            style={{
+              color: "rgba(255, 255, 255, 0.8)",
+              textDecoration: "none",
+              fontWeight: 500,
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = "#e879f9";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Support
+          </a>
+          <RouterLink 
+            to="/setup" 
+            style={{
+              color: "rgba(255, 255, 255, 0.8)",
+              textDecoration: "none",
+              fontWeight: 500,
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = "#e879f9";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Setup Guide
           </RouterLink>
           {!isLoggedIn ? (
             <>
-              <RouterLink to="/" className="nav-link">
+              <RouterLink 
+                to="/signup"
+                style={{
+                  color: "rgba(255, 255, 255, 0.8)",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "all 0.3s ease"
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.color = "#e879f9";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
                 Signup
               </RouterLink>
-              <RouterLink to="/login" className="nav-link">
+              <RouterLink 
+                to="/login"
+                style={{
+                  color: "rgba(255, 255, 255, 0.8)",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "all 0.3s ease"
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.color = "#e879f9";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
                 Login
               </RouterLink>
             </>
           ) : (
-            <>
-              <RouterLink to="/account" className="nav-link">
-                Account
-              </RouterLink>
-            </>
+            <RouterLink 
+              to="/account"
+              style={{
+                color: "rgba(255, 255, 255, 0.8)",
+                textDecoration: "none",
+                fontWeight: 500,
+                transition: "all 0.3s ease"
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = "#e879f9";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              Account
+            </RouterLink>
           )}
         </div>
       </div>

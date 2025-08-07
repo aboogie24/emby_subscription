@@ -164,6 +164,8 @@ def account(access_token: str = Cookie(None)):
         "username": sub.emby_username,
         "status": sub.status,
         "expiry_date": sub.expiry_date.strftime("%Y-%m-%d") if sub.expiry_date else None,
+        "plan_name": sub.plan_name,
+        "plan_id": sub.plan_id,
         "billing_portal_url": billing_portal_url
     }
 # def account(token: str = Depends(HTTPBearer())):
@@ -196,56 +198,120 @@ def account(access_token: str = Cookie(None)):
 #         "billing_portal_url": billing_portal_url
 #     }
 
+@app.get("/subscription-plans")
+def get_subscription_plans():
+    """
+    Returns all active subscription plans from Stripe
+    """
+    try:
+        stripe.api_key = STRIPE_API_KEY
+        
+        # Fetch all active prices from Stripe
+        prices = stripe.Price.list(
+            active=True,
+            type='recurring',
+            expand=['data.product']
+        )
+        
+        plans = []
+        for price in prices.data:
+            # Only include prices that have an associated product
+            if price.product and hasattr(price.product, 'name'):
+                plans.append({
+                    "plan_id": price.id,
+                    "name": price.product.name,
+                    "description": price.product.description or "",
+                    "price": price.unit_amount,
+                    "currency": price.currency,
+                    "interval": price.recurring.interval if price.recurring else "one_time"
+                })
+        
+        return plans
+        
+    except Exception as e:
+        print(f"Error fetching plans from Stripe: {str(e)}")
+        return {"error": "Failed to fetch subscription plans"}
+
+
 @app.post("/signup")
 def signup(data: dict):
     """
     Expects:
     {
         "username": "john_doe",
-        "email": "john@example.com"
+        "email": "john@example.com",
+        "plan_id": "price_1234567890"
     }
     """
     username = data.get("username")
     email = data.get("email")
+    plan_id = data.get("plan_id")
+    
     if not username or not email:
         return {"error": "Username and email required"}
+    
+    if not plan_id:
+        return {"error": "Plan selection is required"}
 
     session = SessionLocal()
 
-    # 1️⃣ Create Emby user immediately
-    emby_id, password = create_emby_user(username)
-    if not emby_id:
-        return {"error": "Failed to create Emby user"}
+    try:
+        # Verify the selected plan exists in Stripe
+        stripe.api_key = STRIPE_API_KEY
+        selected_price = stripe.Price.retrieve(plan_id, expand=['product'])
+        
+        if not selected_price.active:
+            session.close()
+            return {"error": "Selected plan is not active"}
+        
+        plan_name = selected_price.product.name if selected_price.product else "Unknown Plan"
 
-    # Send welcome email
-    send_welcome_email(email, username, password)
+        # 1️⃣ Create Emby user immediately
+        emby_id, password = create_emby_user(username)
+        if not emby_id:
+            session.close()
+            return {"error": "Failed to create Emby user"}
 
-    # Create Stripe Checkout Session
-    checkout_session = stripe.checkout.Session.create(
-        payment_method_types=["card"],
-        customer_email=email,
-        client_reference_id=username,
-        line_items=[
-            {"price": STRIPE_PRICE_ID, "quantity": 1}
-        ],
-        mode="subscription",
-        success_url="https://signup.justpurple.org",
-        cancel_url=F"https://api.justpurple.org/cancel",
-    )
+        # Send welcome email
+        send_welcome_email(email, username, password)
 
-    # Save user as pending
-    new_sub = Subscription(
-        emby_username=username,
-        emby_user_id=emby_id,
-        stripe_customer_id=None,  # Will update after webhook
-        status="pending"
-    )
-    session.add(new_sub)
-    session.commit()
+        # Create Stripe Checkout Session with selected plan
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            customer_email=email,
+            client_reference_id=username,
+            line_items=[
+                {"price": plan_id, "quantity": 1}
+            ],
+            mode="subscription",
+            success_url="https://signup.justpurple.org",
+            cancel_url=F"https://api.justpurple.org/cancel",
+        )
 
-    return {
-        "checkout_url": checkout_session.url,
-        "temporary_password": password}
+        # Save user as pending with plan information
+        new_sub = Subscription(
+            emby_username=username,
+            emby_user_id=emby_id,
+            stripe_customer_id=None,  # Will update after webhook
+            status="pending",
+            plan_id=plan_id,
+            plan_name=plan_name
+        )
+        session.add(new_sub)
+        session.commit()
+        session.close()
+
+        return {
+            "checkout_url": checkout_session.url,
+            "temporary_password": password}
+            
+    except stripe.error.InvalidRequestError:
+        session.close()
+        return {"error": "Invalid plan selected"}
+    except Exception as e:
+        session.close()
+        print(f"Error in signup: {str(e)}")
+        return {"error": "Signup failed"}
 
 @app.post("/webhook")
 async def stripe_webhook(request: Request):

@@ -119,6 +119,10 @@ def debug_token(access_token: str = Cookie(None)):
     print("🔍 Raw token from cookie:", access_token, flush=True)
     username = verify_access_token(access_token)
     print("🔍 Decoded username:", username, flush=True)
+    
+    if not username:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
     return {"raw_token": access_token, "decoded_username": username}
 
 
@@ -225,7 +229,7 @@ def signup(data: dict):
             {"price": STRIPE_PRICE_ID, "quantity": 1}
         ],
         mode="subscription",
-        success_url="https://api.justpurple.org/success?session_id={CHECKOUT_SESSION_ID}",
+        success_url="https://signup.justpurple.org",
         cancel_url=F"https://api.justpurple.org/cancel",
     )
 

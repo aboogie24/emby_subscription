@@ -3,9 +3,24 @@ Migration script to add admin-related columns to existing subscriptions
 """
 import sqlite3
 import datetime
+import os
 
 def migrate_admin_columns():
     """Add new columns for admin functionality"""
+    # Get database path from environment or use default
+    database_url = os.getenv("DATABASE_URL", "sqlite:///./subscriptions.db")
+    
+    # Extract the database file path from the URL
+    if database_url.startswith("sqlite:///"):
+        db_path = database_url.replace("sqlite:///", "")
+        if db_path.startswith("./"):
+            db_path = db_path[2:]  # Remove "./" prefix
+    else:
+        print("This migration script only supports SQLite databases")
+        return False
+    
+    print(f"Migrating database: {db_path}")
+    
     conn = sqlite3.connect('subscriptions.db')
     cursor = conn.cursor()
     

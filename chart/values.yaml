@@ -44,6 +44,11 @@ frontend:
     VITE_API_URL: "http://emby-backend:8000"
     VITE_ALLOWED_HOSTS: "signup.justpurple.org,proxy.justpurple.org"
 
+# Migration
+migration:
+  enabled: true
+  version: ""  # Optional: specify version for unique job names
+
 # Ingress
 ingress:
   enabled: true

@@ -1,0 +1,58 @@
+{{- if .Values.migration.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: emby-migration-{{ .Values.migration.version | default (.Values.backend.image.tag | replace "." "-") }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": pre-upgrade,pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      name: emby-migration
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: migration
+        image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            echo "🚀 Starting Kubernetes database migration..."
+            echo "Database path: {{ .Values.backend.persistence.mountPath }}/subscriptions.db"
+            
+            # Ensure data directory exists
+            mkdir -p {{ .Values.backend.persistence.mountPath }}
+            
+            # Set the correct DATABASE_URL for the persistent volume
+            export DATABASE_URL="sqlite:///{{ .Values.backend.persistence.mountPath }}/subscriptions.db"
+            
+            echo "📊 Running subscription plans migration..."
+            python migrate_database.py
+            
+            echo "👤 Running admin features migration..."
+            python admin_migration.py
+            
+            echo "✅ All migrations completed successfully!"
+        env:
+        {{- range $key, $value := .Values.backend.env }}
+        {{- if ne $key "DATABASE_URL" }}
+        - name: {{ $key }}
+          value: "{{ $value }}"
+        {{- end }}
+        {{- end }}
+        - name: DATABASE_URL
+          value: "sqlite:///{{ .Values.backend.persistence.mountPath }}/subscriptions.db"
+        volumeMounts:
+        - name: backend-storage
+          mountPath: {{ .Values.backend.persistence.mountPath }}
+        workingDir: /app
+      volumes:
+      - name: backend-storage
+        persistentVolumeClaim:
+          claimName: emby-backend-pvc
+  backoffLimit: 3
+{{- end }}

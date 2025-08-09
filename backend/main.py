@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
 from fastapi.responses import JSONResponse
 from stripe_webhooks import handle_webhook
-from database import SessionLocal, Subscription
+from database import SessionLocal, Subscription, get_subscription_query
 import stripe
 from stripe.error import InvalidRequestError
 from email_utils import send_welcome_email
@@ -33,6 +33,10 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 origins = [
     "http://localhost:5173", 
     "http://127.0.0.1:5173",
+    "https://signup.justpurple.org",
+    "https://api.justpurple.org",
+    "https://justpurple.org",
+    "https://www.justpurple.org",
     FRONTEND_URL
 ]
 
@@ -137,7 +141,7 @@ def account(access_token: str = Cookie(None)):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
     session = SessionLocal()
-    sub = session.query(Subscription).filter_by(emby_username=username).first()
+    sub = get_subscription_query(session, username)
     if not sub:
         return {"error": "User not found"}
 

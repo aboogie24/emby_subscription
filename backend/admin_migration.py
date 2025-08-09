@@ -20,8 +20,8 @@ def migrate_admin_columns():
         return False
     
     print(f"Migrating database: {db_path}")
-    
-    conn = sqlite3.connect('subscriptions.db')
+
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     try:

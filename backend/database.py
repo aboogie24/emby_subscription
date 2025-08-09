@@ -21,6 +21,9 @@ class Subscription(Base):
     expiry_date = Column(DateTime, default=datetime.datetime.utcnow)
     plan_id = Column(String, nullable=True)  # Store the selected plan ID
     plan_name = Column(String, nullable=True)  # Store the plan name for easy reference
+    created_via_management = Column(Boolean, default=True)  # Track if user was created via this tool
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    email = Column(String, nullable=True)  # Store user email for admin reference
 
 class SubscriptionPlan(Base):
     __tablename__ = "subscription_plans"

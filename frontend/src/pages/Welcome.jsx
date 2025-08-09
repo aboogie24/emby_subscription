@@ -95,7 +95,7 @@ export default function Welcome() {
             backgroundClip: 'text',
             lineHeight: 1.1
           }}>
-            Your Personal Cinema Universe
+            The JustPurple Movie Experience
           </h1>
 
           <p style={{

@@ -5,11 +5,80 @@ import axios from "axios";
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState("monthly");
-  const [loading, setLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  const [availablePlans, setAvailablePlans] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState({ checking: false, available: null, message: "" });
   const navigate = useNavigate();
+
+  // Fetch available plans from backend
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/subscription-plans`);
+        if (response.data && Array.isArray(response.data)) {
+          setAvailablePlans(response.data);
+          // Set default selected plan to the first available plan
+          if (response.data.length > 0) {
+            setSelectedPlan(response.data[0].plan_id);
+          }
+        } else {
+          setErrors({ general: "No subscription plans available" });
+        }
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+        setErrors({ general: "Failed to load subscription plans. Please try again later." });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  // Debounced username validation
+  useEffect(() => {
+    const checkUsername = async () => {
+      if (!username.trim() || username.trim().length < 3) {
+        setUsernameStatus({ checking: false, available: null, message: "" });
+        return;
+      }
+
+      // Basic format validation first
+      if (!/^[a-zA-Z0-9_-]+$/.test(username.trim())) {
+        setUsernameStatus({ 
+          checking: false, 
+          available: false, 
+          message: "Username can only contain letters, numbers, underscores, and hyphens" 
+        });
+        return;
+      }
+
+      setUsernameStatus({ checking: true, available: null, message: "Checking availability..." });
+
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/check-username/${encodeURIComponent(username.trim())}`);
+        setUsernameStatus({
+          checking: false,
+          available: response.data.available,
+          message: response.data.message
+        });
+      } catch (error) {
+        console.error("Error checking username:", error);
+        setUsernameStatus({
+          checking: false,
+          available: false,
+          message: "Error checking username availability"
+        });
+      }
+    };
+
+    const timeoutId = setTimeout(checkUsername, 500); // 500ms debounce
+    return () => clearTimeout(timeoutId);
+  }, [username]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -34,6 +103,11 @@ export default function Signup() {
       newErrors.email = "Email address is too long";
     }
 
+    // Plan validation
+    if (!selectedPlan) {
+      newErrors.plan = "Please select a subscription plan";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -49,21 +123,19 @@ export default function Signup() {
     setErrors({});
 
     try {
-      // Map the plan selection to the backend format
-      const planMapping = {
-        'quarterly': 'quarterly_plan',
-        'monthly': 'monthly_plan'
-      };
-
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, {
         username: username.trim(), 
         email: email.trim(),
-        plan_id: planMapping[selectedPlan] || 'monthly_plan'
+        plan_id: selectedPlan
+      }, {
+        withCredentials: true // Important: This ensures cookies are sent/received
       });
       
       if (res.data.checkout_url) {
+        // User account created successfully, redirect to Stripe checkout
         window.location.href = res.data.checkout_url;
       } else if (res.status === 200) {
+        // Account created successfully, navigate to account page
         navigate("/account");
       } else {
         const errorMessage = res.data.error || "Signup failed. Please try again.";
@@ -173,7 +245,6 @@ export default function Signup() {
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
-            text-align: center;
         }
 
         .signup-card::before {
@@ -214,14 +285,16 @@ export default function Signup() {
             line-height: 1.4;
         }
 
-        /* Form Styles */
+        /* Form Styles - FIXED */
+        form {
+            margin: 0 auto;
+            max-width: 400px;
+            width: 100%;
+        }
+
         .form-group {
             margin-bottom: 20px;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
 
         .form-group label {
@@ -314,6 +387,7 @@ export default function Signup() {
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            text-align: left; /* Reset text alignment for plan content */
         }
 
         .plan-card::before {
@@ -343,7 +417,6 @@ export default function Signup() {
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            text-align: center;
         }
 
         .plan-name {
@@ -367,7 +440,6 @@ export default function Signup() {
             font-weight: 800;
             color: #fbbf24;
             margin-bottom: 6px;
-            text-align: center;
         }
 
         .plan-price .period {
@@ -381,21 +453,17 @@ export default function Signup() {
             font-size: 13px;
             line-height: 1.4;
             margin-bottom: 12px;
-            text-align: center;
         }
 
         .plan-features {
             padding-top: 12px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
         }
 
         .plan-features ul {
             list-style: none;
             margin: 0;
             padding: 0;
-            display: inline-block;
-            text-align: left;
         }
 
         .plan-features li {
@@ -573,6 +641,21 @@ export default function Signup() {
                 {errors.username && (
                   <div className="error-message">{errors.username}</div>
                 )}
+                {usernameStatus.message && (
+                  <div style={{ 
+                    fontSize: '12px', 
+                    marginTop: '5px', 
+                    textAlign: 'center',
+                    color: usernameStatus.checking ? 'rgba(255, 255, 255, 0.7)' : 
+                           usernameStatus.available === true ? '#10b981' : 
+                           usernameStatus.available === false ? '#ff6b6b' : 'rgba(255, 255, 255, 0.7)'
+                  }}>
+                    {usernameStatus.checking && '⏳ '}
+                    {usernameStatus.available === true && '✅ '}
+                    {usernameStatus.available === false && '❌ '}
+                    {usernameStatus.message}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -593,78 +676,65 @@ export default function Signup() {
 
               <div className="form-group">
                 <label>Choose Your Plan</label>
-                <div className="plans-container">
-                  <div className="plans-grid">
-                    <div className="plan-option">
-                      <input 
-                        type="radio" 
-                        id="quarterly" 
-                        name="plan" 
-                        value="quarterly"
-                        checked={selectedPlan === "quarterly"}
-                        onChange={(e) => handlePlanChange(e.target.value)}
-                      />
-                      <label htmlFor="quarterly" className="plan-card">
-                        <div className="plan-header">
-                          <span className="plan-name">3 Month Plan</span>
-                          <span className="plan-badge">Save 20%</span>
+                {loading ? (
+                  <div style={{ textAlign: 'center', padding: '20px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                    Loading subscription plans...
+                  </div>
+                ) : availablePlans.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px', color: '#ff6b6b' }}>
+                    No subscription plans available. Please contact support.
+                  </div>
+                ) : (
+                  <div className="plans-container">
+                    <div className="plans-grid">
+                      {availablePlans.map((plan) => (
+                        <div key={plan.plan_id} className="plan-option">
+                          <input 
+                            type="radio" 
+                            id={plan.plan_id} 
+                            name="plan" 
+                            value={plan.plan_id}
+                            checked={selectedPlan === plan.plan_id}
+                            onChange={(e) => handlePlanChange(e.target.value)}
+                          />
+                          <label htmlFor={plan.plan_id} className="plan-card">
+                            <div className="plan-header">
+                              <span className="plan-name">{plan.name}</span>
+                              {plan.interval === 'year' && (
+                                <span className="plan-badge">Best Value</span>
+                              )}
+                            </div>
+                            <div className="plan-price">
+                              ${(plan.price / 100).toFixed(2)} <span className="period">/ {plan.interval}</span>
+                            </div>
+                            <div className="plan-description">
+                              {plan.description || `${plan.name} - ${plan.interval}ly billing`}
+                            </div>
+                            <div className="plan-features">
+                              <ul>
+                                <li>Unlimited streaming on all devices</li>
+                                <li>HD &amp; 4K content library</li>
+                                <li>Content requests</li>
+                                <li>Customer support</li>
+                              </ul>
+                            </div>
+                          </label>
                         </div>
-                        <div className="plan-price">
-                          $26.00 <span className="period">/ month</span>
-                        </div>
-                        <div className="plan-description">
-                          Billed quarterly at $78.00. Best value for committed users.
-                        </div>
-                        <div className="plan-features">
-                          <ul>
-                            <li>Unlimited streaming on all devices</li>
-                            <li>4K HDR content with Dolby Atmos</li>
-                            <li>Priority content requests (&lt; 12 hours)</li>
-                            <li>Premium support</li>
-                          </ul>
-                        </div>
-                      </label>
-                    </div>
-
-                    <div className="plan-option">
-                      <input 
-                        type="radio" 
-                        id="monthly" 
-                        name="plan" 
-                        value="monthly" 
-                        checked={selectedPlan === "monthly"}
-                        onChange={(e) => handlePlanChange(e.target.value)}
-                      />
-                      <label htmlFor="monthly" className="plan-card">
-                        <div className="plan-header">
-                          <span className="plan-name">Monthly Plan</span>
-                        </div>
-                        <div className="plan-price">
-                          $10.00 <span className="period">/ month</span>
-                        </div>
-                        <div className="plan-description">
-                          Flexible monthly billing. Cancel anytime with no commitment.
-                        </div>
-                        <div className="plan-features">
-                          <ul>
-                            <li>Unlimited streaming on all devices</li>
-                            <li>HD &amp; 4K content library</li>
-                            <li>Content requests (&lt; 24 hours)</li>
-                            <li>Standard support</li>
-                          </ul>
-                        </div>
-                      </label>
+                      ))}
                     </div>
                   </div>
-                </div>
+                )}
+                {errors.plan && (
+                  <div className="error-message">{errors.plan}</div>
+                )}
               </div>
 
               <button 
                 type="submit" 
                 className={`submit-btn ${isSubmitting ? 'loading' : ''}`}
-                disabled={isSubmitting}
+                disabled={isSubmitting || loading || availablePlans.length === 0}
               >
-                {isSubmitting ? 'Creating Your Account' : '⚡ START MY JOURNEY'}
+                {isSubmitting ? 'Creating Your Account' : loading ? 'Loading Plans...' : '⚡ START MY JOURNEY'}
               </button>
             </form>
 

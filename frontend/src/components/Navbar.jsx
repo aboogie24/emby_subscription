@@ -1,15 +1,39 @@
 import { useEffect, useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const checkAuthStatus = () => {
     axios.get(`${import.meta.env.VITE_API_URL}/debug-token`, { withCredentials: true })
-      .then(() => setIsLoggedIn(true))
-      .catch(() => setIsLoggedIn(false));
+      .then(() => {
+        setIsLoggedIn(true);
+        checkAdminStatus();
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setIsAdmin(false);
+      });
+  };
+
+  const checkAdminStatus = () => {
+    axios.get(`${import.meta.env.VITE_API_URL}/admin/stats`, { withCredentials: true })
+      .then((response) => {
+        // Only set admin to true if we get a successful JSON response
+        if (response.data && typeof response.data === 'object') {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      })
+      .catch((error) => {
+        console.log('Admin check failed (expected for non-admin users):', error.response?.status);
+        setIsAdmin(false);
+      });
   };
 
   useEffect(() => {
@@ -76,15 +100,14 @@ export default function Navbar() {
       left: 0, 
       right: 0, 
       zIndex: 1000,
-      padding: "0.5rem 2rem",
+      padding: "0.5rem 3rem",
       height: "60px"
     }}>
       <div style={{ 
         display: "flex", 
         alignItems: "center", 
         justifyContent: "space-between",
-        maxWidth: "1200px",
-        margin: "0 auto"
+        width: "100%"
       }}>
         <RouterLink 
           to="/" 
@@ -106,7 +129,7 @@ export default function Navbar() {
             e.currentTarget.style.transform = "translateY(0)";
           }}
         >
-          EMBY GALAXY
+          EMBY JUSTPURPLE
         </RouterLink>
         
         <div style={{ 
@@ -134,8 +157,8 @@ export default function Navbar() {
           >
             Features
           </a>
-          <a 
-            href="#pricing"
+          <RouterLink 
+            to="/pricing"
             style={{
               color: "rgba(255, 255, 255, 0.8)",
               textDecoration: "none",
@@ -152,9 +175,9 @@ export default function Navbar() {
             }}
           >
             Pricing
-          </a>
-          <a 
-            href="#support"
+          </RouterLink>
+          <RouterLink 
+            to="/support"
             style={{
               color: "rgba(255, 255, 255, 0.8)",
               textDecoration: "none",
@@ -171,26 +194,28 @@ export default function Navbar() {
             }}
           >
             Support
-          </a>
-          <RouterLink 
-            to="/setup" 
-            style={{
-              color: "rgba(255, 255, 255, 0.8)",
-              textDecoration: "none",
-              fontWeight: 500,
-              transition: "all 0.3s ease"
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.color = "#e879f9";
-              e.currentTarget.style.transform = "translateY(-2px)";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
-          >
-            Setup Guide
           </RouterLink>
+          {location.pathname === '/account' && (
+            <RouterLink 
+              to="/setup" 
+              style={{
+                color: "rgba(255, 255, 255, 0.8)",
+                textDecoration: "none",
+                fontWeight: 500,
+                transition: "all 0.3s ease"
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = "#e879f9";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              Setup Guide
+            </RouterLink>
+          )}
           {!isLoggedIn ? (
             <>
               <RouterLink 
@@ -233,25 +258,51 @@ export default function Navbar() {
               </RouterLink>
             </>
           ) : (
-            <RouterLink 
-              to="/account"
-              style={{
-                color: "rgba(255, 255, 255, 0.8)",
-                textDecoration: "none",
-                fontWeight: 500,
-                transition: "all 0.3s ease"
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.color = "#e879f9";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              Account
-            </RouterLink>
+            <>
+              <RouterLink 
+                to="/account"
+                style={{
+                  color: "rgba(255, 255, 255, 0.8)",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "all 0.3s ease"
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.color = "#e879f9";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.color = "rgba(255, 255, 255, 0.8)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                Account
+              </RouterLink>
+              {isAdmin && (
+                <RouterLink 
+                  to="/admin"
+                  style={{
+                    color: "rgba(255, 165, 0, 0.9)",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                    transition: "all 0.3s ease",
+                    textShadow: "0 0 10px rgba(255, 165, 0, 0.3)"
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.color = "#ffa500";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.textShadow = "0 0 15px rgba(255, 165, 0, 0.5)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.color = "rgba(255, 165, 0, 0.9)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.textShadow = "0 0 10px rgba(255, 165, 0, 0.3)";
+                  }}
+                >
+                  Admin
+                </RouterLink>
+              )}
+            </>
           )}
         </div>
       </div>

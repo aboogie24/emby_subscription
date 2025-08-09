@@ -2,8 +2,27 @@ apiVersion: v1
 entries:
   emby-subscription:
   - apiVersion: v2
+    appVersion: 0.1.47
+    created: "2025-08-09T04:49:31.504232662Z"
+    description: Self-hosted Emby subscription platform with Stripe intergration
+    digest: 13317a595a42d9809e90c3a5de6aafe7e3397ae76bb8e0e8aebb2c5c384200e6
+    home: https://github.com/aboogie24/emby_subscription
+    keywords:
+    - emby
+    - stripe
+    - subscriptions
+    maintainers:
+    - email: alfred.brown@alfredbrowniii.io
+      name: Alfred Brown
+    name: emby-subscription
+    sources:
+    - https://github.com/aboogie24/emby_subscription
+    urls:
+    - https://aboogie24.github.io/emby_subscription/charts/emby-subscription-0.1.47.tgz
+    version: 0.1.47
+  - apiVersion: v2
     appVersion: 0.1.46
-    created: "2025-08-09T04:39:06.670918201Z"
+    created: "2025-08-09T04:49:31.503691257Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 668a224a963ff5568963fcdbd8910efc6cc2da3df34a6663583af9ec910c476d
     home: https://github.com/aboogie24/emby_subscription
@@ -22,7 +41,7 @@ entries:
     version: 0.1.46
   - apiVersion: v2
     appVersion: 0.1.44
-    created: "2025-08-09T04:39:06.670570617Z"
+    created: "2025-08-09T04:49:31.503358333Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 8c3d828df6ccdf489f05f02d1142c78a605b39400b842a2b2f6b2d6884417ba5
     home: https://github.com/aboogie24/emby_subscription
@@ -41,7 +60,7 @@ entries:
     version: 0.1.44
   - apiVersion: v2
     appVersion: 0.1.43
-    created: "2025-08-09T04:39:06.670204678Z"
+    created: "2025-08-09T04:49:31.503016742Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 3ba820d90ae76e3b6db556db3693814bdcaa920fbee42d822a7eb66db6eadcbb
     home: https://github.com/aboogie24/emby_subscription
@@ -60,7 +79,7 @@ entries:
     version: 0.1.43
   - apiVersion: v2
     appVersion: 0.1.42
-    created: "2025-08-09T04:39:06.669342173Z"
+    created: "2025-08-09T04:49:31.502704707Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 8fbfe052e98947c57603116bd600683139477c90bfec8b489eb4d404ea3c1d48
     home: https://github.com/aboogie24/emby_subscription
@@ -79,7 +98,7 @@ entries:
     version: 0.1.42
   - apiVersion: v2
     appVersion: 0.1.41
-    created: "2025-08-09T04:39:06.668536356Z"
+    created: "2025-08-09T04:49:31.50239182Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 654ef9015fca39fe055feac078aa5b2524490b87ce69a576da83bb67c580ad15
     home: https://github.com/aboogie24/emby_subscription
@@ -98,7 +117,7 @@ entries:
     version: 0.1.41
   - apiVersion: v2
     appVersion: 0.1.40
-    created: "2025-08-09T04:39:06.668194452Z"
+    created: "2025-08-09T04:49:31.502053996Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 63d44af8860c19fbdbc79d0c28ffa7da7ca60900b4c9dc7133472959e3c56957
     home: https://github.com/aboogie24/emby_subscription
@@ -117,7 +136,7 @@ entries:
     version: 0.1.40
   - apiVersion: v2
     appVersion: 0.1.39
-    created: "2025-08-09T04:39:06.667631533Z"
+    created: "2025-08-09T04:49:31.501486873Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 5b6453460fe17bbd502a65f78475f2ee416f0799c0400bbe1871c0c056cbbdd7
     home: https://github.com/aboogie24/emby_subscription
@@ -136,7 +155,7 @@ entries:
     version: 0.1.39
   - apiVersion: v2
     appVersion: 0.1.38
-    created: "2025-08-09T04:39:06.667288227Z"
+    created: "2025-08-09T04:49:31.50117056Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: a3c5965c81be1fa2be84ca04242550e17fd1aad848a4a4a19195f86cc638782b
     home: https://github.com/aboogie24/emby_subscription
@@ -155,7 +174,7 @@ entries:
     version: 0.1.38
   - apiVersion: v2
     appVersion: 0.1.37
-    created: "2025-08-09T04:39:06.667027386Z"
+    created: "2025-08-09T04:49:31.500884734Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: f83282ab7db44ec3ab95126bdac66219971cc855aa4b989327a0503136f3209f
     home: https://github.com/aboogie24/emby_subscription
@@ -174,7 +193,7 @@ entries:
     version: 0.1.37
   - apiVersion: v2
     appVersion: 0.1.36
-    created: "2025-08-09T04:39:06.66676361Z"
+    created: "2025-08-09T04:49:31.500612042Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 678a38db0ebe11a1046267673b4bc46a465a78645c9dec630df4e3ac764d333b
     home: https://github.com/aboogie24/emby_subscription
@@ -193,7 +212,7 @@ entries:
     version: 0.1.36
   - apiVersion: v2
     appVersion: 0.1.34
-    created: "2025-08-09T04:39:06.666456011Z"
+    created: "2025-08-09T04:49:31.500341375Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 3ac0d8e1082bed844a0bd3acf8c090f4cb973698e4f9d70eaa5c365974be5a88
     home: https://github.com/aboogie24/emby_subscription
@@ -212,7 +231,7 @@ entries:
     version: 0.1.34
   - apiVersion: v2
     appVersion: 0.1.33
-    created: "2025-08-09T04:39:06.666175022Z"
+    created: "2025-08-09T04:49:31.500038657Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 4ce2b467f955e92f216108f5305be9dfdba081bc0c1ffa6986ae0a2d6c8d2753
     home: https://github.com/aboogie24/emby_subscription
@@ -231,7 +250,7 @@ entries:
     version: 0.1.33
   - apiVersion: v2
     appVersion: 0.1.32
-    created: "2025-08-09T04:39:06.665914171Z"
+    created: "2025-08-09T04:49:31.499764012Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 6a6416fdb55c57c89c20a851c1929a59e00c29534e1642f616aa65f4d98f38fd
     home: https://github.com/aboogie24/emby_subscription
@@ -250,7 +269,7 @@ entries:
     version: 0.1.32
   - apiVersion: v2
     appVersion: 0.1.31
-    created: "2025-08-09T04:39:06.665643802Z"
+    created: "2025-08-09T04:49:31.499461605Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 25fef34b27555808872cd98648dae3cb4a4b72705b516de76b88ed5cc6a4e11f
     home: https://github.com/aboogie24/emby_subscription
@@ -269,7 +288,7 @@ entries:
     version: 0.1.31
   - apiVersion: v2
     appVersion: 0.1.30
-    created: "2025-08-09T04:39:06.665347114Z"
+    created: "2025-08-09T04:49:31.499177191Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 26d3a9530e7d59fde6b48d3392d5e6fa0827dd5ff5723cf510a092d9908e8e96
     home: https://github.com/aboogie24/emby_subscription
@@ -288,7 +307,7 @@ entries:
     version: 0.1.30
   - apiVersion: v2
     appVersion: 0.1.29
-    created: "2025-08-09T04:39:06.664838817Z"
+    created: "2025-08-09T04:49:31.498016888Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 99f44271d4f2e7774395389fc85bcb2e137e918e6f6f37cdba89a1df4de974dc
     home: https://github.com/aboogie24/emby_subscription
@@ -307,7 +326,7 @@ entries:
     version: 0.1.29
   - apiVersion: v2
     appVersion: 0.1.28
-    created: "2025-08-09T04:39:06.664555524Z"
+    created: "2025-08-09T04:49:31.497469031Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: fa623e23b867a0d9b803fca8c84c6480530ba9ec352af3120feef87ef91c3cc2
     home: https://github.com/aboogie24/emby_subscription
@@ -326,7 +345,7 @@ entries:
     version: 0.1.28
   - apiVersion: v2
     appVersion: 0.1.27
-    created: "2025-08-09T04:39:06.664251081Z"
+    created: "2025-08-09T04:49:31.497194877Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: ac481da5153c779524b8e3b48a2e9f17dd9a547397b1b9d9203135f228806e8a
     home: https://github.com/aboogie24/emby_subscription
@@ -345,7 +364,7 @@ entries:
     version: 0.1.27
   - apiVersion: v2
     appVersion: 0.1.26
-    created: "2025-08-09T04:39:06.663978197Z"
+    created: "2025-08-09T04:49:31.496908359Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 3805413e65c81c325a26a74b775f700b77928ce7f8409e564f8b165a91331d91
     home: https://github.com/aboogie24/emby_subscription
@@ -364,7 +383,7 @@ entries:
     version: 0.1.26
   - apiVersion: v2
     appVersion: 0.1.25
-    created: "2025-08-09T04:39:06.663702979Z"
+    created: "2025-08-09T04:49:31.496635648Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 598a71dfcefa6145f512cd5e5012845d0711bd63b4f7e94a64c7692b61baa196
     home: https://github.com/aboogie24/emby_subscription
@@ -383,7 +402,7 @@ entries:
     version: 0.1.25
   - apiVersion: v2
     appVersion: 0.1.24
-    created: "2025-08-09T04:39:06.663381845Z"
+    created: "2025-08-09T04:49:31.496354561Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 961e0165e08108e981c1d0ecf492bba49b1cca854d40fb38f57613a336bd1a29
     home: https://github.com/aboogie24/emby_subscription
@@ -402,7 +421,7 @@ entries:
     version: 0.1.24
   - apiVersion: v2
     appVersion: 0.1.23
-    created: "2025-08-09T04:39:06.662586187Z"
+    created: "2025-08-09T04:49:31.496055009Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 2ab445227697318982b3fe84ef405f49de6e6dfbc054e02eb707302d2435aef5
     home: https://github.com/aboogie24/emby_subscription
@@ -421,7 +440,7 @@ entries:
     version: 0.1.23
   - apiVersion: v2
     appVersion: 0.1.22
-    created: "2025-08-09T04:39:06.662084002Z"
+    created: "2025-08-09T04:49:31.495791936Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 5f3787a5d81490cd73a1d60de2e8d1960bb97d1d9df777fa062ef1779e697c38
     home: https://github.com/aboogie24/emby_subscription
@@ -440,7 +459,7 @@ entries:
     version: 0.1.22
   - apiVersion: v2
     appVersion: 0.1.21
-    created: "2025-08-09T04:39:06.661804746Z"
+    created: "2025-08-09T04:49:31.495524784Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: da7d0baeb16ea3639f41bc22cb9664b2397974718aca264491ab4d84c05ed98a
     home: https://github.com/aboogie24/emby_subscription
@@ -459,7 +478,7 @@ entries:
     version: 0.1.21
   - apiVersion: v2
     appVersion: 0.1.20
-    created: "2025-08-09T04:39:06.66132829Z"
+    created: "2025-08-09T04:49:31.495262102Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 6f158228d4027211383439cba69b5656fe411f087f2a8fb439ac540f3bb4ca19
     home: https://github.com/aboogie24/emby_subscription
@@ -478,7 +497,7 @@ entries:
     version: 0.1.20
   - apiVersion: v2
     appVersion: 0.1.19
-    created: "2025-08-09T04:39:06.660825564Z"
+    created: "2025-08-09T04:49:31.494752196Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 23d79f69ae14226e26d5491c005ac3ccb2e9244893af765434f77a4600edd296
     home: https://github.com/aboogie24/emby_subscription
@@ -497,7 +516,7 @@ entries:
     version: 0.1.19
   - apiVersion: v2
     appVersion: 0.1.18
-    created: "2025-08-09T04:39:06.660543513Z"
+    created: "2025-08-09T04:49:31.494488211Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: c11b0c376ba3846ad1fbf9f483fd0a114c1ca3b8acba93b787eb6766a3df9d69
     home: https://github.com/aboogie24/emby_subscription
@@ -516,7 +535,7 @@ entries:
     version: 0.1.18
   - apiVersion: v2
     appVersion: 0.1.17
-    created: "2025-08-09T04:39:06.660252164Z"
+    created: "2025-08-09T04:49:31.49421058Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 17524558510313fecee4d6d48bdcf694be750c4c616965d8c2f573579e2dc765
     home: https://github.com/aboogie24/emby_subscription
@@ -535,7 +554,7 @@ entries:
     version: 0.1.17
   - apiVersion: v2
     appVersion: 0.1.16
-    created: "2025-08-09T04:39:06.659983338Z"
+    created: "2025-08-09T04:49:31.493909445Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 05d6820e695c20e67da69459801a599205667555af08d4705093f02c364f821b
     home: https://github.com/aboogie24/emby_subscription
@@ -554,7 +573,7 @@ entries:
     version: 0.1.16
   - apiVersion: v2
     appVersion: 0.1.15
-    created: "2025-08-09T04:39:06.659703912Z"
+    created: "2025-08-09T04:49:31.493647193Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 7502683267abd2895cde3a34aaa46a72e4b7425a1fac310d8504df01746de605
     home: https://github.com/aboogie24/emby_subscription
@@ -573,7 +592,7 @@ entries:
     version: 0.1.15
   - apiVersion: v2
     appVersion: 0.1.14
-    created: "2025-08-09T04:39:06.659370906Z"
+    created: "2025-08-09T04:49:31.493359614Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 170fa2d0415ea59ff670b93a8969c951a4d184758673eca5dc139a30dabb7c4a
     home: https://github.com/aboogie24/emby_subscription
@@ -592,7 +611,7 @@ entries:
     version: 0.1.14
   - apiVersion: v2
     appVersion: 0.1.13
-    created: "2025-08-09T04:39:06.659098212Z"
+    created: "2025-08-09T04:49:31.493055123Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: bac587479d3d469fcc548161c20f5a2c4c1940ff322f22024fb93e75a1bfaa1a
     home: https://github.com/aboogie24/emby_subscription
@@ -611,7 +630,7 @@ entries:
     version: 0.1.13
   - apiVersion: v2
     appVersion: 0.1.11
-    created: "2025-08-09T04:39:06.658796505Z"
+    created: "2025-08-09T04:49:31.492757955Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: dadcba7bcf6dbf86f70857ca32ef86604faba5207544bd1cc867111bea601581
     home: https://github.com/aboogie24/emby_subscription
@@ -630,7 +649,7 @@ entries:
     version: 0.1.11
   - apiVersion: v2
     appVersion: 0.1.10
-    created: "2025-08-09T04:39:06.658498294Z"
+    created: "2025-08-09T04:49:31.492457542Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: b0e1010a719a5861fd31d3438678a07efbcf7297187b41e7f253149081a5251e
     home: https://github.com/aboogie24/emby_subscription
@@ -649,7 +668,7 @@ entries:
     version: 0.1.10
   - apiVersion: v2
     appVersion: 0.1.9
-    created: "2025-08-09T04:39:06.672244538Z"
+    created: "2025-08-09T04:49:31.506219584Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 49093118a0ebbe5f4bb288dba4eea0ae1006f30f1ca19b85bc329c7633f260d4
     home: https://github.com/aboogie24/emby_subscription
@@ -668,7 +687,7 @@ entries:
     version: 0.1.9
   - apiVersion: v2
     appVersion: 0.1.8
-    created: "2025-08-09T04:39:06.671999126Z"
+    created: "2025-08-09T04:49:31.505519746Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 44b183387343c35ec7d09a745a42d3aaadb76148ded7bf654093d7e1d4274ee9
     home: https://github.com/aboogie24/emby_subscription
@@ -687,7 +706,7 @@ entries:
     version: 0.1.8
   - apiVersion: v2
     appVersion: 0.1.7
-    created: "2025-08-09T04:39:06.671753283Z"
+    created: "2025-08-09T04:49:31.505024878Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 9dbf447936323e7bfaa01422b595a7441f14efaea119bef6f2e73ecbb13fec18
     home: https://github.com/aboogie24/emby_subscription
@@ -706,7 +725,7 @@ entries:
     version: 0.1.7
   - apiVersion: v2
     appVersion: 0.1.6
-    created: "2025-08-09T04:39:06.671486391Z"
+    created: "2025-08-09T04:49:31.504766894Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: b8366ba52c5256bf85b28b004207b3d793fef758614e399ec601f38be24b6146
     home: https://github.com/aboogie24/emby_subscription
@@ -725,7 +744,7 @@ entries:
     version: 0.1.6
   - apiVersion: v2
     appVersion: 0.1.5
-    created: "2025-08-09T04:39:06.671227904Z"
+    created: "2025-08-09T04:49:31.504505725Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: f7a2007738e50a19f9772b57f717cc2b281fe811f05f42fbc601b5b0bc13d88b
     home: https://github.com/aboogie24/emby_subscription
@@ -744,7 +763,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: 0.1.4
-    created: "2025-08-09T04:39:06.667885982Z"
+    created: "2025-08-09T04:49:31.501740158Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 43156d70370b1ba518191198c7a99e22eaef802f4b6e24712f8f67b56753a4c1
     home: https://github.com/aboogie24/emby_subscription
@@ -763,7 +782,7 @@ entries:
     version: 0.1.4
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-08-09T04:39:06.665076725Z"
+    created: "2025-08-09T04:49:31.498754258Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 2d18c934ecd1b1d3ff54e6eefeeaa0dccb8883965939b4b1b3cae7abfde9f9ec
     home: https://github.com/aboogie24/emby_subscription
@@ -782,7 +801,7 @@ entries:
     version: 0.1.3
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-08-09T04:39:06.661063341Z"
+    created: "2025-08-09T04:49:31.494981897Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: d2980111c6614eddfe4365c752ba3526c226f2675b04513aef9d5aba023147c9
     home: https://github.com/aboogie24/emby_subscription
@@ -801,7 +820,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-08-09T04:39:06.658210031Z"
+    created: "2025-08-09T04:49:31.492133264Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: a9a3c5ce5f91f495f4551e3b4cd2baa5ca39376477c4b0d0a810776402777e40
     home: https://github.com/aboogie24/emby_subscription
@@ -820,7 +839,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-08-09T04:39:06.657930034Z"
+    created: "2025-08-09T04:49:31.491838622Z"
     description: Self-hosted Emby subscription platform with Stripe intergration
     digest: 490f0db0602c6f7e22c86733eb8cb80e34d74c622e4bf4587cd84004eb11d7ee
     home: https://github.com/aboogie24/emby_subscription
@@ -837,4 +856,4 @@ entries:
     urls:
     - https://aboogie24.github.io/emby_subscription/charts/emby-subscription-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-09T04:39:06.657533398Z"
+generated: "2025-08-09T04:49:31.491447949Z"

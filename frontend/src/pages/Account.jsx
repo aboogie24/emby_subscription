@@ -48,13 +48,33 @@ export default function Account() {
           <div style={{ marginBottom: "1rem" }}>
             <h3 style={{ color: "var(--light-purple)", marginBottom: "0.5rem" }}>Status</h3>
             <p style={{ 
-              color: account.status === 'active' ? "var(--accent-pink)" : "rgba(255, 255, 255, 0.7)", 
+              color: account.status === 'active' ? "var(--accent-pink)" : 
+                     account.status === 'pending' ? "#fbbf24" : "rgba(255, 255, 255, 0.7)", 
               fontSize: "1.1rem",
               textTransform: "capitalize"
             }}>
               {account.status}
             </p>
+            {account.status === 'pending' && (
+              <p style={{ 
+                color: "rgba(255, 255, 255, 0.8)", 
+                fontSize: "0.9rem", 
+                marginTop: "0.5rem",
+                fontStyle: "italic"
+              }}>
+                Your account is created! Complete payment to activate your subscription.
+              </p>
+            )}
           </div>
+
+          {account.plan_name && (
+            <div style={{ marginBottom: "1rem" }}>
+              <h3 style={{ color: "var(--light-purple)", marginBottom: "0.5rem" }}>Current Plan</h3>
+              <p style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: "1.1rem" }}>
+                {account.plan_name}
+              </p>
+            </div>
+          )}
           
           <div style={{ marginBottom: "1rem" }}>
             <h3 style={{ color: "var(--light-purple)", marginBottom: "0.5rem" }}>Next Renewal</h3>

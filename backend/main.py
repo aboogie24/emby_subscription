@@ -445,6 +445,28 @@ def get_all_users(admin_username: str = Depends(require_admin)):
             # Get subscription info from our database
             sub = session.query(Subscription).filter_by(emby_username=username).first()
             
+            # Safely get attributes that might not exist yet
+            created_via_management = False
+            email = None
+            created_at = None
+            
+            if sub:
+                try:
+                    created_via_management = getattr(sub, 'created_via_management', False)
+                except:
+                    created_via_management = False
+                
+                try:
+                    email = getattr(sub, 'email', None)
+                except:
+                    email = None
+                
+                try:
+                    created_at_obj = getattr(sub, 'created_at', None)
+                    created_at = created_at_obj.strftime("%Y-%m-%d %H:%M") if created_at_obj else None
+                except:
+                    created_at = None
+            
             user_data = {
                 "username": username,
                 "emby_user_id": user_id,
@@ -452,12 +474,12 @@ def get_all_users(admin_username: str = Depends(require_admin)):
                 "is_admin": is_admin,
                 "last_activity": last_activity,
                 "has_subscription": bool(sub),
-                "created_via_management": sub.created_via_management if sub else False,
+                "created_via_management": created_via_management,
                 "subscription_status": sub.status if sub else "none",
                 "plan_name": sub.plan_name if sub else None,
                 "expiry_date": sub.expiry_date.strftime("%Y-%m-%d") if sub and sub.expiry_date else None,
-                "email": sub.email if sub else None,
-                "created_at": sub.created_at.strftime("%Y-%m-%d %H:%M") if sub and sub.created_at else None
+                "email": email,
+                "created_at": created_at
             }
             users_data.append(user_data)
         
@@ -558,7 +580,15 @@ def get_admin_stats(admin_username: str = Depends(require_admin)):
         total_subscriptions = session.query(Subscription).count()
         active_subscriptions = session.query(Subscription).filter_by(status="active").count()
         pending_subscriptions = session.query(Subscription).filter_by(status="pending").count()
-        created_via_management = session.query(Subscription).filter_by(created_via_management=True).count()
+        
+        # Check if created_via_management column exists before querying
+        created_via_management = 0
+        try:
+            created_via_management = session.query(Subscription).filter_by(created_via_management=True).count()
+        except Exception as col_error:
+            print(f"Warning: created_via_management column not found: {str(col_error)}")
+            # Column doesn't exist yet, return 0
+            created_via_management = 0
         
         # Get total Emby users
         url = f"{EMBY_SERVER_URL}/emby/Users"
@@ -714,6 +744,66 @@ def archive_stripe_plan(plan_id: str, admin_username: str = Depends(require_admi
     except Exception as e:
         print(f"Error archiving Stripe plan: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to archive plan")
+
+@app.post("/admin/migrate")
+def run_migrations(admin_username: str = Depends(require_admin)):
+    """
+    Manually run database migrations
+    """
+    try:
+        import subprocess
+        import sys
+        
+        results = []
+        
+        # Run subscription plans migration
+        try:
+            result = subprocess.run([sys.executable, "migrate_database.py"], 
+                                  capture_output=True, text=True, cwd="/app")
+            results.append({
+                "migration": "subscription_plans",
+                "success": result.returncode == 0,
+                "output": result.stdout,
+                "error": result.stderr if result.returncode != 0 else None
+            })
+        except Exception as e:
+            results.append({
+                "migration": "subscription_plans",
+                "success": False,
+                "output": "",
+                "error": str(e)
+            })
+        
+        # Run admin features migration
+        try:
+            result = subprocess.run([sys.executable, "admin_migration.py"], 
+                                  capture_output=True, text=True, cwd="/app")
+            results.append({
+                "migration": "admin_features",
+                "success": result.returncode == 0,
+                "output": result.stdout,
+                "error": result.stderr if result.returncode != 0 else None
+            })
+        except Exception as e:
+            results.append({
+                "migration": "admin_features",
+                "success": False,
+                "output": "",
+                "error": str(e)
+            })
+        
+        # Check if all migrations succeeded
+        all_success = all(r["success"] for r in results)
+        
+        return {
+            "message": "Migrations completed" if all_success else "Some migrations failed",
+            "success": all_success,
+            "results": results
+        }
+        
+    except Exception as e:
+        print(f"Error running migrations: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to run migrations")
 
 @app.get("/")
 def home():

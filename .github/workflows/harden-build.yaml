@@ -1,0 +1,256 @@
+name: Docker and Helm Chart Release
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions: 
+  contents: write
+  packages: write
+  security-events: write  # For uploading SARIF results
+  id-token: write         # For OIDC token generation
+  attestations: write     # For generating attestations
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Updated to v4
+      
+      # Dockerfile linting
+      - name: Run Hadolint (Dockerfile linting)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: "./backend/Dockerfile"
+          format: sarif
+          output-file: hadolint-backend.sarif
+          no-fail: true
+      
+      - name: Run Hadolint (Frontend Dockerfile)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: "./frontend/Dockerfile"
+          format: sarif
+          output-file: hadolint-frontend.sarif
+          no-fail: true
+      
+      # Upload Hadolint results to GitHub Security tab
+      - name: Upload Hadolint SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: hadolint-backend.sarif
+          category: hadolint-backend
+      
+      - name: Upload Hadolint SARIF (Frontend)
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: hadolint-frontend.sarif
+          category: hadolint-frontend
+
+      # Static analysis with Checkov
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: dockerfile
+          output_format: sarif
+          output_file_path: checkov.sarif
+      
+      - name: Upload Checkov SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: checkov.sarif
+          category: checkov
+
+  build-and-push-container:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    environment: Dev
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    outputs:
+      image-digest-backend: ${{ steps.build-backend.outputs.digest }}
+      image-digest-frontend: ${{ steps.build-frontend.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Updated to v4
+      
+      - name: Set up QEMU (for multi-arch emulation)
+        uses: docker/setup-qemu-action@v3  # Updated to v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      # Generate metadata for better tagging
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push Docker image
+        id: build-${{ matrix.service }}
+        uses: docker/build-push-action@v5  # Updated to v5
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64 
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Security improvements
+          provenance: true      # Generate provenance attestation
+          sbom: true           # Generate SBOM
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      # Vulnerability scanning with Trivy
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-${{ matrix.service }}.sarif'
+      
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-${{ matrix.service }}.sarif'
+          category: 'trivy-${{ matrix.service }}'
+      
+      # Alternative: Fail on HIGH/CRITICAL vulnerabilities
+      - name: Run Trivy vulnerability scanner (fail on high/critical)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
+          format: 'table'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'  # Fail the build on high/critical vulnerabilities
+      
+      # Generate and attest SBOM
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        if: github.event_name != 'pull_request'
+        with:
+          subject-name: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}
+          subject-digest: ${{ steps.build-${{ matrix.service }}.outputs.digest }}
+          push-to-registry: true
+
+  # Image signing with Cosign (optional but recommended)
+  sign-images:
+    runs-on: ubuntu-latest
+    needs: build-and-push-container
+    if: github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Sign container image
+        run: |
+          cosign sign --yes ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
+
+  helm-release:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-container, sign-images]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Updated to v4
+    
+      - name: Extract Version from Tag
+        id: vars
+        run: |
+          REF="${GITHUB_REF}"
+          echo "Ref is $REF"
+          if [[ "$REF" == "refs/heads/main" ]]; then
+            echo "Push to main branch detected - skipping release."
+            exit 0 
+          fi
+          
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "Chart version will be set to $VERSION"
+      
+      - name: Update Chart.yaml with Version
+        run: |
+          yq e -i ".version = \"${VERSION#v}\"" ./chart/Chart.yaml
+          yq e -i ".appVersion = \"${VERSION#v}\"" ./chart/Chart.yaml
+          cat ./chart/Chart.yaml
+      
+      - name: Set up Helm
+        uses: azure/setup-helm@v4  # Updated to v4
+        with:
+          version: v3.13.2
+      
+      # Helm security scanning
+      - name: Run Checkov on Helm charts
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ./chart
+          framework: helm
+          output_format: sarif
+          output_file_path: helm-checkov.sarif
+      
+      - name: Upload Helm Checkov SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: helm-checkov.sarif
+          category: helm-checkov
+      
+      - name: Package Helm chart
+        run: |
+          helm lint ./chart
+          helm package ./chart --destination packaged
+      
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4  # Updated to v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+      
+      - name: Update Helm repo index
+        run: |
+          cd gh-pages
+          mkdir -p charts
+          cp ../packaged/*.tgz charts/
+          helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts --merge charts/index.yaml || helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts
+      
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "Update Helm chart [skip ci]" || echo "No changes to commit"
+          git push origin gh-pages

@@ -68,6 +68,20 @@ async def startup_event():
             print(f"{route.methods} {route.path}")
     print("========================")
 
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint for container health monitoring
+    """
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "healthy",
+            "service": "emby-subscription-backend"
+        }
+    )
+
 
 @app.post("/logout")
 def logout():

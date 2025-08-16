@@ -15,6 +15,208 @@ permissions:
   attestations: write     # For generating attestations
 
 jobs:
+  static-code-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # CodeQL Analysis (GitHub's semantic analysis)
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python, javascript
+          queries: security-extended,security-and-quality
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "codeql"
+      
+      # Python Security Analysis with Bandit
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Bandit
+        run: pip install bandit[toml]
+      
+      - name: Run Bandit Security Analysis
+        run: |
+          bandit -r ./backend -f sarif -o bandit-results.sarif || true
+      
+      - name: Upload Bandit SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('bandit-results.sarif') != ''
+        with:
+          sarif_file: bandit-results.sarif
+          category: bandit
+      
+      # Python Dependency Vulnerability Scanning
+      - name: Install Safety
+        run: pip install safety
+      
+      - name: Run Safety Check
+        run: |
+          cd backend
+          safety check --json --output safety-results.json || true
+          # Convert to SARIF format (simplified)
+          python -c "
+import json
+import sys
+import os
+
+try:
+    with open('safety-results.json', 'r') as f:
+        safety_data = json.load(f)
+    
+    sarif = {
+        '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+        'version': '2.1.0',
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'Safety',
+                    'version': '1.0.0'
+                }
+            },
+            'results': []
+        }]
+    }
+    
+    for vuln in safety_data:
+        sarif['runs'][0]['results'].append({
+            'ruleId': vuln.get('id', 'SAFETY-001'),
+            'level': 'error',
+            'message': {
+                'text': f\"Vulnerability in {vuln.get('package_name', 'unknown')}: {vuln.get('advisory', 'No description')}\"
+            },
+            'locations': [{
+                'physicalLocation': {
+                    'artifactLocation': {
+                        'uri': 'requirements.txt'
+                    }
+                }
+            }]
+        })
+    
+    with open('safety-results.sarif', 'w') as f:
+        json.dump(sarif, f, indent=2)
+except Exception as e:
+    print(f'Error processing safety results: {e}')
+    sys.exit(0)
+"
+      
+      - name: Upload Safety SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('backend/safety-results.sarif') != ''
+        with:
+          sarif_file: backend/safety-results.sarif
+          category: safety
+      
+      # JavaScript/Node.js Analysis with ESLint
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Install ESLint Security Plugin
+        run: |
+          cd frontend
+          npm install --save-dev eslint @eslint/js eslint-plugin-security @microsoft/eslint-formatter-sarif
+      
+      - name: Run ESLint Security Analysis
+        run: |
+          cd frontend
+          npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif || true
+      
+      - name: Upload ESLint SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('frontend/eslint-results.sarif') != ''
+        with:
+          sarif_file: frontend/eslint-results.sarif
+          category: eslint
+      
+      # Node.js Dependency Vulnerability Scanning
+      - name: Run npm audit
+        run: |
+          cd frontend
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          # Convert npm audit to SARIF
+          node -e "
+const fs = require('fs');
+const auditData = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
+
+const sarif = {
+  '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+  'version': '2.1.0',
+  'runs': [{
+    'tool': {
+      'driver': {
+        'name': 'npm audit',
+        'version': '1.0.0'
+      }
+    },
+    'results': []
+  }]
+};
+
+if (auditData.vulnerabilities) {
+  Object.entries(auditData.vulnerabilities).forEach(([pkg, vuln]) => {
+    sarif.runs[0].results.push({
+      'ruleId': vuln.name || 'NPM-AUDIT',
+      'level': vuln.severity === 'critical' || vuln.severity === 'high' ? 'error' : 'warning',
+      'message': {
+        'text': \`Vulnerability in \${pkg}: \${vuln.title || 'No description'}\`
+      },
+      'locations': [{
+        'physicalLocation': {
+          'artifactLocation': {
+            'uri': 'package.json'
+          }
+        }
+      }]
+    });
+  });
+}
+
+fs.writeFileSync('npm-audit.sarif', JSON.stringify(sarif, null, 2));
+"
+      
+      - name: Upload npm audit SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('frontend/npm-audit.sarif') != ''
+        with:
+          sarif_file: frontend/npm-audit.sarif
+          category: npm-audit
+      
+      # Multi-language Analysis with Semgrep
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+            p/dockerfile
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        continue-on-error: true
+
   security-scan:
     runs-on: ubuntu-latest
     steps:
@@ -41,14 +243,14 @@ jobs:
       # Upload Hadolint results to GitHub Security tab
       - name: Upload Hadolint SARIF
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('hadolint-backend.sarif') != ''
         with:
           sarif_file: hadolint-backend.sarif
           category: hadolint-backend
       
       - name: Upload Hadolint SARIF (Frontend)
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('hadolint-frontend.sarif') != ''
         with:
           sarif_file: hadolint-frontend.sarif
           category: hadolint-frontend
@@ -64,7 +266,7 @@ jobs:
       
       - name: Upload Checkov SARIF
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('checkov.sarif') != ''
         with:
           sarif_file: checkov.sarif
           category: checkov
@@ -76,6 +278,8 @@ jobs:
     strategy:
       matrix:
         service: [backend, frontend]
+      fail-fast: false  # Don't cancel other jobs if one fails
+      fail-fast: false  # Don't cancel other jobs if one fails
     steps:
       - name: Checkout code
         uses: actions/checkout@v4  # Updated to v4
@@ -129,17 +333,19 @@ jobs:
           image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
           format: 'sarif'
           output: 'trivy-${{ matrix.service }}.sarif'
+        continue-on-error: true  # Don't fail if Trivy has issues
       
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('trivy-${{ matrix.service }}.sarif') != ''
         with:
           sarif_file: 'trivy-${{ matrix.service }}.sarif'
           category: 'trivy-${{ matrix.service }}'
       
-      # Alternative: Fail on HIGH/CRITICAL vulnerabilities
+      # Alternative: Fail on HIGH/CRITICAL vulnerabilities (only in production)
       - name: Run Trivy vulnerability scanner (fail on high/critical)
         uses: aquasecurity/trivy-action@master
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
         with:
           image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
           format: 'table'
@@ -220,7 +426,465 @@ jobs:
       
       - name: Upload Helm Checkov SARIF
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('helm-checkov.sarif') != ''
+        with:
+          sarif_file: helm-checkov.sarif
+          category: helm-checkov
+      
+      - name: Package Helm chart
+        run: |
+          helm lint ./chart
+          helm package ./chart --destination packaged
+      
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4  # Updated to v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+      
+      - name: Update Helm repo index
+        run: |
+          cd gh-pages
+          mkdir -p charts
+          cp ../packaged/*.tgz charts/
+          helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts --merge charts/index.yaml || helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts
+      
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "Update Helm chart [skip ci]" || echo "No changes to commit"
+          git push origin gh-pagesname: Docker and Helm Chart Release
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions: 
+  contents: write
+  packages: write
+  security-events: write  # For uploading SARIF results
+  id-token: write         # For OIDC token generation
+  attestations: write     # For generating attestations
+
+jobs:
+  static-code-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # CodeQL Analysis (GitHub's semantic analysis)
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python, javascript
+          queries: security-extended,security-and-quality
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "codeql"
+      
+      # Python Security Analysis with Bandit
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Bandit
+        run: pip install bandit[toml]
+      
+      - name: Run Bandit Security Analysis
+        run: |
+          bandit -r ./backend -f sarif -o bandit-results.sarif || true
+      
+      - name: Upload Bandit SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('bandit-results.sarif') != ''
+        with:
+          sarif_file: bandit-results.sarif
+          category: bandit
+      
+      # Python Dependency Vulnerability Scanning
+      - name: Install Safety
+        run: pip install safety
+      
+      - name: Run Safety Check
+        run: |
+          cd backend
+          safety check --json --output safety-results.json || true
+          # Convert to SARIF format (simplified)
+          python -c "
+import json
+import sys
+import os
+
+try:
+    with open('safety-results.json', 'r') as f:
+        safety_data = json.load(f)
+    
+    sarif = {
+        '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+        'version': '2.1.0',
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'Safety',
+                    'version': '1.0.0'
+                }
+            },
+            'results': []
+        }]
+    }
+    
+    for vuln in safety_data:
+        sarif['runs'][0]['results'].append({
+            'ruleId': vuln.get('id', 'SAFETY-001'),
+            'level': 'error',
+            'message': {
+                'text': f\"Vulnerability in {vuln.get('package_name', 'unknown')}: {vuln.get('advisory', 'No description')}\"
+            },
+            'locations': [{
+                'physicalLocation': {
+                    'artifactLocation': {
+                        'uri': 'requirements.txt'
+                    }
+                }
+            }]
+        })
+    
+    with open('safety-results.sarif', 'w') as f:
+        json.dump(sarif, f, indent=2)
+except Exception as e:
+    print(f'Error processing safety results: {e}')
+    sys.exit(0)
+"
+      
+      - name: Upload Safety SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('backend/safety-results.sarif') != ''
+        with:
+          sarif_file: backend/safety-results.sarif
+          category: safety
+      
+      # JavaScript/Node.js Analysis with ESLint
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Install ESLint Security Plugin
+        run: |
+          cd frontend
+          npm install --save-dev eslint @eslint/js eslint-plugin-security @microsoft/eslint-formatter-sarif
+      
+      - name: Run ESLint Security Analysis
+        run: |
+          cd frontend
+          npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif || true
+      
+      - name: Upload ESLint SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('frontend/eslint-results.sarif') != ''
+        with:
+          sarif_file: frontend/eslint-results.sarif
+          category: eslint
+      
+      # Node.js Dependency Vulnerability Scanning
+      - name: Run npm audit
+        run: |
+          cd frontend
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          # Convert npm audit to SARIF
+          node -e "
+const fs = require('fs');
+const auditData = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
+
+const sarif = {
+  '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+  'version': '2.1.0',
+  'runs': [{
+    'tool': {
+      'driver': {
+        'name': 'npm audit',
+        'version': '1.0.0'
+      }
+    },
+    'results': []
+  }]
+};
+
+if (auditData.vulnerabilities) {
+  Object.entries(auditData.vulnerabilities).forEach(([pkg, vuln]) => {
+    sarif.runs[0].results.push({
+      'ruleId': vuln.name || 'NPM-AUDIT',
+      'level': vuln.severity === 'critical' || vuln.severity === 'high' ? 'error' : 'warning',
+      'message': {
+        'text': \`Vulnerability in \${pkg}: \${vuln.title || 'No description'}\`
+      },
+      'locations': [{
+        'physicalLocation': {
+          'artifactLocation': {
+            'uri': 'package.json'
+          }
+        }
+      }]
+    });
+  });
+}
+
+fs.writeFileSync('npm-audit.sarif', JSON.stringify(sarif, null, 2));
+"
+      
+      - name: Upload npm audit SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('frontend/npm-audit.sarif') != ''
+        with:
+          sarif_file: frontend/npm-audit.sarif
+          category: npm-audit
+      
+      # Multi-language Analysis with Semgrep
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+            p/dockerfile
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        continue-on-error: true
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Updated to v4
+      
+      # Dockerfile linting
+      - name: Run Hadolint (Dockerfile linting)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: "./backend/Dockerfile"
+          format: sarif
+          output-file: hadolint-backend.sarif
+          no-fail: true
+      
+      - name: Run Hadolint (Frontend Dockerfile)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: "./frontend/Dockerfile"
+          format: sarif
+          output-file: hadolint-frontend.sarif
+          no-fail: true
+      
+      # Upload Hadolint results to GitHub Security tab
+      - name: Upload Hadolint SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('hadolint-backend.sarif') != ''
+        with:
+          sarif_file: hadolint-backend.sarif
+          category: hadolint-backend
+      
+      - name: Upload Hadolint SARIF (Frontend)
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('hadolint-frontend.sarif') != ''
+        with:
+          sarif_file: hadolint-frontend.sarif
+          category: hadolint-frontend
+
+      # Static analysis with Checkov
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: dockerfile
+          output_format: sarif
+          output_file_path: checkov.sarif
+      
+      - name: Upload Checkov SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('checkov.sarif') != ''
+        with:
+          sarif_file: checkov.sarif
+          category: checkov
+
+  build-and-push-container:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    environment: Dev
+    strategy:
+      matrix:
+        service: [backend, frontend]
+      fail-fast: false  # Don't cancel other jobs if one fails
+      fail-fast: false  # Don't cancel other jobs if one fails
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Updated to v4
+      
+      - name: Set up QEMU (for multi-arch emulation)
+        uses: docker/setup-qemu-action@v3  # Updated to v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      # Generate metadata for better tagging
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5  # Updated to v5
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64 
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Security improvements
+          provenance: true      # Generate provenance attestation
+          sbom: true           # Generate SBOM
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      # Vulnerability scanning with Trivy
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-${{ matrix.service }}.sarif'
+        continue-on-error: true  # Don't fail if Trivy has issues
+      
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('trivy-${{ matrix.service }}.sarif') != ''
+        with:
+          sarif_file: 'trivy-${{ matrix.service }}.sarif'
+          category: 'trivy-${{ matrix.service }}'
+      
+      # Alternative: Fail on HIGH/CRITICAL vulnerabilities (only in production)
+      - name: Run Trivy vulnerability scanner (fail on high/critical)
+        uses: aquasecurity/trivy-action@master
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
+          format: 'table'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'  # Fail the build on high/critical vulnerabilities
+      
+      # Generate and attest SBOM
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        if: github.event_name != 'pull_request'
+        with:
+          subject-name: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+  # Image signing with Cosign (optional but recommended)
+  sign-images:
+    runs-on: ubuntu-latest
+    needs: build-and-push-container
+    if: github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Sign container image
+        run: |
+          cosign sign --yes ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
+
+  helm-release:
+    runs-on: ubuntu-latest
+    needs: [sign-images]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Updated to v4
+    
+      - name: Extract Version from Tag
+        id: vars
+        run: |
+          REF="${GITHUB_REF}"
+          echo "Ref is $REF"
+          if [[ "$REF" == "refs/heads/main" ]]; then
+            echo "Push to main branch detected - skipping release."
+            exit 0 
+          fi
+          
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "Chart version will be set to $VERSION"
+      
+      - name: Update Chart.yaml with Version
+        run: |
+          yq e -i ".version = \"${VERSION#v}\"" ./chart/Chart.yaml
+          yq e -i ".appVersion = \"${VERSION#v}\"" ./chart/Chart.yaml
+          cat ./chart/Chart.yaml
+      
+      - name: Set up Helm
+        uses: azure/setup-helm@v4  # Updated to v4
+        with:
+          version: v3.13.2
+      
+      # Helm security scanning
+      - name: Run Checkov on Helm charts
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ./chart
+          framework: helm
+          output_format: sarif
+          output_file_path: helm-checkov.sarif
+      
+      - name: Upload Helm Checkov SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('helm-checkov.sarif') != ''
         with:
           sarif_file: helm-checkov.sarif
           category: helm-checkov

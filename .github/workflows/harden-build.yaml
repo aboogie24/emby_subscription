@@ -69,134 +69,134 @@ jobs:
           safety check --json --output safety-results.json || true
           # Convert to SARIF format (simplified)
           python -c "
-import json
-import sys
-import os
+            import json
+            import sys
+            import os
 
-try:
-    with open('safety-results.json', 'r') as f:
-        safety_data = json.load(f)
+            try:
+                with open('safety-results.json', 'r') as f:
+                    safety_data = json.load(f)
+                
+                sarif = {
+                    '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+                    'version': '2.1.0',
+                    'runs': [{
+                        'tool': {
+                            'driver': {
+                                'name': 'Safety',
+                                'version': '1.0.0'
+                            }
+                        },
+                        'results': []
+                    }]
+                }
     
-    sarif = {
-        '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
-        'version': '2.1.0',
-        'runs': [{
-            'tool': {
+              for vuln in safety_data:
+                  sarif['runs'][0]['results'].append({
+                      'ruleId': vuln.get('id', 'SAFETY-001'),
+                      'level': 'error',
+                      'message': {
+                          'text': f\"Vulnerability in {vuln.get('package_name', 'unknown')}: {vuln.get('advisory', 'No description')}\"
+                      },
+                      'locations': [{
+                          'physicalLocation': {
+                              'artifactLocation': {
+                                  'uri': 'requirements.txt'
+                              }
+                          }
+                      }]
+                  })
+              
+              with open('safety-results.sarif', 'w') as f:
+                  json.dump(sarif, f, indent=2)
+          except Exception as e:
+              print(f'Error processing safety results: {e}')
+              sys.exit(0)
+          "
+                
+                - name: Upload Safety SARIF
+                  uses: github/codeql-action/upload-sarif@v3
+                  if: always() && hashFiles('backend/safety-results.sarif') != ''
+                  with:
+                    sarif_file: backend/safety-results.sarif
+                    category: safety
+                
+                # JavaScript/Node.js Analysis with ESLint
+                - name: Set up Node.js
+                  uses: actions/setup-node@v4
+                  with:
+                    node-version: '20'
+                    cache: 'npm'
+                    cache-dependency-path: frontend/package-lock.json
+                
+                - name: Install frontend dependencies
+                  run: |
+                    cd frontend
+                    npm ci
+                
+                - name: Install ESLint Security Plugin
+                  run: |
+                    cd frontend
+                    npm install --save-dev eslint @eslint/js eslint-plugin-security @microsoft/eslint-formatter-sarif
+                
+                - name: Run ESLint Security Analysis
+                  run: |
+                    cd frontend
+                    npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif || true
+                
+                - name: Upload ESLint SARIF
+                  uses: github/codeql-action/upload-sarif@v3
+                  if: always() && hashFiles('frontend/eslint-results.sarif') != ''
+                  with:
+                    sarif_file: frontend/eslint-results.sarif
+                    category: eslint
+                
+                # Node.js Dependency Vulnerability Scanning
+                - name: Run npm audit
+                  run: |
+                    cd frontend
+                    npm audit --audit-level=moderate --json > npm-audit.json || true
+                    # Convert npm audit to SARIF
+                    node -e "
+          const fs = require('fs');
+          const auditData = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
+
+          const sarif = {
+            '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+            'version': '2.1.0',
+            'runs': [{
+              'tool': {
                 'driver': {
-                    'name': 'Safety',
-                    'version': '1.0.0'
+                  'name': 'npm audit',
+                  'version': '1.0.0'
                 }
-            },
-            'results': []
-        }]
-    }
-    
-    for vuln in safety_data:
-        sarif['runs'][0]['results'].append({
-            'ruleId': vuln.get('id', 'SAFETY-001'),
-            'level': 'error',
-            'message': {
-                'text': f\"Vulnerability in {vuln.get('package_name', 'unknown')}: {vuln.get('advisory', 'No description')}\"
-            },
-            'locations': [{
-                'physicalLocation': {
-                    'artifactLocation': {
-                        'uri': 'requirements.txt'
-                    }
-                }
+              },
+              'results': []
             }]
-        })
-    
-    with open('safety-results.sarif', 'w') as f:
-        json.dump(sarif, f, indent=2)
-except Exception as e:
-    print(f'Error processing safety results: {e}')
-    sys.exit(0)
-"
-      
-      - name: Upload Safety SARIF
-        uses: github/codeql-action/upload-sarif@v3
-        if: always() && hashFiles('backend/safety-results.sarif') != ''
-        with:
-          sarif_file: backend/safety-results.sarif
-          category: safety
-      
-      # JavaScript/Node.js Analysis with ESLint
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm ci
-      
-      - name: Install ESLint Security Plugin
-        run: |
-          cd frontend
-          npm install --save-dev eslint @eslint/js eslint-plugin-security @microsoft/eslint-formatter-sarif
-      
-      - name: Run ESLint Security Analysis
-        run: |
-          cd frontend
-          npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif || true
-      
-      - name: Upload ESLint SARIF
-        uses: github/codeql-action/upload-sarif@v3
-        if: always() && hashFiles('frontend/eslint-results.sarif') != ''
-        with:
-          sarif_file: frontend/eslint-results.sarif
-          category: eslint
-      
-      # Node.js Dependency Vulnerability Scanning
-      - name: Run npm audit
-        run: |
-          cd frontend
-          npm audit --audit-level=moderate --json > npm-audit.json || true
-          # Convert npm audit to SARIF
-          node -e "
-const fs = require('fs');
-const auditData = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
+          };
 
-const sarif = {
-  '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
-  'version': '2.1.0',
-  'runs': [{
-    'tool': {
-      'driver': {
-        'name': 'npm audit',
-        'version': '1.0.0'
-      }
-    },
-    'results': []
-  }]
-};
-
-if (auditData.vulnerabilities) {
-  Object.entries(auditData.vulnerabilities).forEach(([pkg, vuln]) => {
-    sarif.runs[0].results.push({
-      'ruleId': vuln.name || 'NPM-AUDIT',
-      'level': vuln.severity === 'critical' || vuln.severity === 'high' ? 'error' : 'warning',
-      'message': {
-        'text': \`Vulnerability in \${pkg}: \${vuln.title || 'No description'}\`
-      },
-      'locations': [{
-        'physicalLocation': {
-          'artifactLocation': {
-            'uri': 'package.json'
+          if (auditData.vulnerabilities) {
+            Object.entries(auditData.vulnerabilities).forEach(([pkg, vuln]) => {
+              sarif.runs[0].results.push({
+                'ruleId': vuln.name || 'NPM-AUDIT',
+                'level': vuln.severity === 'critical' || vuln.severity === 'high' ? 'error' : 'warning',
+                'message': {
+                  'text': \`Vulnerability in \${pkg}: \${vuln.title || 'No description'}\`
+                },
+                'locations': [{
+                  'physicalLocation': {
+                    'artifactLocation': {
+                      'uri': 'package.json'
+                    }
+                  }
+                }]
+              });
+            });
           }
-        }
-      }]
-    });
-  });
-}
 
-fs.writeFileSync('npm-audit.sarif', JSON.stringify(sarif, null, 2));
-"
-      
+          fs.writeFileSync('npm-audit.sarif', JSON.stringify(sarif, null, 2));
+          "
+                
       - name: Upload npm audit SARIF
         uses: github/codeql-action/upload-sarif@v3
         if: always() && hashFiles('frontend/npm-audit.sarif') != ''

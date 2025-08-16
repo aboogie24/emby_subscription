@@ -72,6 +72,7 @@ def migrate_admin_columns():
     conn.commit()
     conn.close()
     print("Migration completed successfully")
+    return True
 
 if __name__ == "__main__":
     migrate_admin_columns()

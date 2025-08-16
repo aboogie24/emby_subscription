@@ -76,9 +76,6 @@ jobs:
     strategy:
       matrix:
         service: [backend, frontend]
-    outputs:
-      image-digest-backend: ${{ steps.build-backend.outputs.digest }}
-      image-digest-frontend: ${{ steps.build-frontend.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4  # Updated to v4
@@ -110,7 +107,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
       
       - name: Build and push Docker image
-        id: build-${{ matrix.service }}
+        id: build
         uses: docker/build-push-action@v5  # Updated to v5
         with:
           context: ./${{ matrix.service }}
@@ -155,7 +152,7 @@ jobs:
         if: github.event_name != 'pull_request'
         with:
           subject-name: ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}
-          subject-digest: ${{ steps.build-${{ matrix.service }}.outputs.digest }}
+          subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
 
   # Image signing with Cosign (optional but recommended)
@@ -182,7 +179,7 @@ jobs:
 
   helm-release:
     runs-on: ubuntu-latest
-    needs: [build-and-push-container, sign-images]
+    needs: [sign-images]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4  # Updated to v4

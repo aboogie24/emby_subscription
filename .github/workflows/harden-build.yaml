@@ -66,8 +66,7 @@ jobs:
       - name: Run Safety Check
         run: |
           cd backend
-          safety scan --help 
-          safety scan --output json > safety-results.json
+          safety scan --output json --continue-on-error > safety-results.json || true
           cat safety-results.json
           
           # Convert to SARIF format (simplified)

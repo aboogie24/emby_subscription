@@ -7,3 +7,7 @@ python-dotenv
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
+
+# Security fixes for vulnerabilities found by Trivy
+ecdsa>=0.19.2  # Fix for CVE-2024-23342 (Minerva attack vulnerability)
+setuptools>=78.1.1  # Fix for CVE-2024-6345 and CVE-2025-47273

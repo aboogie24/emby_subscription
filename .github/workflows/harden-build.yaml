@@ -67,7 +67,7 @@ jobs:
         run: |
           cd backend
           safety check --help
-          safety check --json --output safety-results.json || true
+          safety check -o json > safety-results.json || true 
           # Convert to SARIF format (simplified)
           python -c "
           import json

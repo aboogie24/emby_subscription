@@ -1,0 +1,4 @@
+# Ignore CVE-2024-23342 in ecdsa package as no fix is available yet
+# ecdsa 0.19.1 is the latest version but still vulnerable to Minerva attack
+# This is a known issue with no current mitigation available
+CVE-2024-23342

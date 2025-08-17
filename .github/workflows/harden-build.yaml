@@ -68,8 +68,8 @@ jobs:
           cd backend
           safety check --help
           safety check --save-json safety-results.json
-          echo safety-results.json
-          safety check -o json --debug > safety-results.json 
+          cat safety-results.json
+          
           # Convert to SARIF format (simplified)
           python -c "
           import json

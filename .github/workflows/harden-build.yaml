@@ -432,7 +432,7 @@ jobs:
         with:
           subject-name: ${{ env.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}
           subject-digest: ${{ steps.build.outputs.digest }}
-          push-to-registry: true
+          push-to-registry: false
 
   # Image signing with Cosign (optional but recommended)
   sign-images:

@@ -78,6 +78,8 @@ jobs:
               with open('safety-results.json', 'r') as f:
                   safety_data = json.load(f)
               
+              print(safety_data)
+              
               sarif = {
                   '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
                   'version': '2.1.0',

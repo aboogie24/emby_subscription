@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies (including dev dependencies for build)
-RUN npm ci --silent
+RUN npm install --silent
 
 # Copy source code
 COPY . .
@@ -18,9 +18,8 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
-# Create non-root user
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S appuser -u 1001 -G nginx
+# Create non-root user (nginx group already exists in nginx:alpine)
+RUN adduser -S appuser -u 1001 -G nginx
 
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html

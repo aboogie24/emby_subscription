@@ -440,10 +440,6 @@ jobs:
     needs: build-and-push-container
     if: github.event_name != 'pull_request'
 
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
     strategy:
       matrix:
         service: [backend, frontend]
@@ -455,12 +451,12 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       - name: Sign container image
         run: |
-          cosign sign --yes ${{ env.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:main
+          cosign sign --yes ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:main
 
   helm-release:
     runs-on: ubuntu-latest

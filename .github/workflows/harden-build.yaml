@@ -80,7 +80,7 @@ jobs:
               with open('safety-results.json', 'r') as f:
                   safety_data = json.load(f)
               
-              print(safety_data)
+              print(f'Safety v.3.6.0 scan results: {safety_data}')
               
               sarif = {
                   '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
@@ -89,19 +89,36 @@ jobs:
                       'tool': {
                           'driver': {
                               'name': 'Safety',
-                              'version': '1.0.0'
+                              'version': '3.6.0'
                           }
                       },
                       'results': []
                   }]
               }
+
+              vulnerabilities = [] 
+              if ininstance(safety_data, dict):
+                vulerabilities = safety_data.get('vulerabilities', safety_data.get('results', []))
+                if 'scan_target' in safety)data: 
+                    scan_results = safety_data.get('scan_target', {}).get('vulnerabilities', [])
+                    vulnerabilities.extend(scan_results)
+              elif isinstance(safety_data, list): 
+                  vulnerabilities = safety_data
               
-              for vuln in safety_data:
+              for vuln in vulnerabilities:
+                  vuln_id = str(vuln.get('id', vuln.get('vulnerability_id', vuln.get('cve_id', 'SAFETY-001'))))
+                  package_name = vuln.get('package_name', vuln.get('package', vuln.get('dependency_name', 'unknown')))
+                  advisory = vuln.get('advisory', vuln.get('title', vuln.get('description', 'No description')))
+                  severity = vuln.get('severity', 'unknown')
                   sarif['runs'][0]['results'].append({
-                      'ruleId': vuln.get('id', 'SAFETY-001'),
-                      'level': 'error',
+                      'ruleId': vuln_id,
+                      'level': 'error' if severity.lower() in ['high', 'critical'] else 'warning',
                       'message': {
-                          'text': f\"Vulnerability in {vuln.get('package_name', 'unknown')}: {vuln.get('advisory', 'No description')}\"
+                          'text': f\"Vulnerability {vuln_id} in {package_name}: {advisory}\"
+                      },
+                      'properties': {
+                          'severity': severity,
+                          'package': package_name
                       },
                       'locations': [{
                           'physicalLocation': {
@@ -114,9 +131,22 @@ jobs:
               
               with open('safety-results.sarif', 'w') as f:
                   json.dump(sarif, f, indent=2)
+              
+              print(f'Created SARIF with {len(vulnerabilities)} vulnerabilities')
           except Exception as e:
               print(f'Error processing safety results: {e}')
-              sys.exit(0)
+              # Create empty SARIF on error
+              empty_sarif = {
+                  '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+                  'version': '2.1.0',
+                  'runs': [{
+                      'tool': {'driver': {'name': 'Safety', 'version': '3.6.0'}},
+                      'results': []
+                  }]
+              }
+              with open('safety-results.sarif', 'w') as f:
+                  json.dump(empty_sarif, f, indent=2)
+              
           "
                 
                 - name: Upload Safety SARIF

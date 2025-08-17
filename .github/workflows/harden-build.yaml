@@ -83,7 +83,7 @@ jobs:
               print(f'Safety v.3.6.0 scan results: {safety_data}')
               
               sarif = {
-                  '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+                  '$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
                   'version': '2.1.0',
                   'runs': [{
                       'tool': {
@@ -97,11 +97,11 @@ jobs:
               }
 
               vulnerabilities = [] 
-              if ininstance(safety_data, dict):
-                vulerabilities = safety_data.get('vulerabilities', safety_data.get('results', []))
-                if 'scan_target' in safety)data: 
-                    scan_results = safety_data.get('scan_target', {}).get('vulnerabilities', [])
-                    vulnerabilities.extend(scan_results)
+              if isinstance(safety_data, dict):
+                  vulnerabilities = safety_data.get('vulnerabilities', safety_data.get('results', []))
+                  if 'scan_target' in safety_data:
+                      scan_results = safety_data.get('scan_target', {}).get('vulnerabilities', [])
+                      vulnerabilities.extend(scan_results)
               elif isinstance(safety_data, list): 
                   vulnerabilities = safety_data
               
@@ -137,7 +137,7 @@ jobs:
               print(f'Error processing safety results: {e}')
               # Create empty SARIF on error
               empty_sarif = {
-                  '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+                  '$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
                   'version': '2.1.0',
                   'runs': [{
                       'tool': {'driver': {'name': 'Safety', 'version': '3.6.0'}},
@@ -145,59 +145,58 @@ jobs:
                   }]
               }
               with open('safety-results.sarif', 'w') as f:
-                  json.dump(empty_sarif, f, indent=2)
-              
+                  json.dump(empty_sarif, f, indent=2)      
           "
-                
-                - name: Upload Safety SARIF
-                  uses: github/codeql-action/upload-sarif@v3
-                  if: always() && hashFiles('backend/safety-results.sarif') != ''
-                  with:
-                    sarif_file: backend/safety-results.sarif
-                    category: safety
-                
-                # JavaScript/Node.js Analysis with ESLint
-                - name: Set up Node.js
-                  uses: actions/setup-node@v4
-                  with:
-                    node-version: '20'
-                    cache: 'npm'
-                    cache-dependency-path: frontend/package-lock.json
-                
-                - name: Install frontend dependencies
-                  run: |
-                    cd frontend
-                    npm ci
-                
-                - name: Install ESLint Security Plugin
-                  run: |
-                    cd frontend
-                    npm install --save-dev eslint @eslint/js eslint-plugin-security @microsoft/eslint-formatter-sarif
-                
-                - name: Run ESLint Security Analysis
-                  run: |
-                    cd frontend
-                    npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif || true
-                
-                - name: Upload ESLint SARIF
-                  uses: github/codeql-action/upload-sarif@v3
-                  if: always() && hashFiles('frontend/eslint-results.sarif') != ''
-                  with:
-                    sarif_file: frontend/eslint-results.sarif
-                    category: eslint
-                
-                # Node.js Dependency Vulnerability Scanning
-                - name: Run npm audit
-                  run: |
-                    cd frontend
-                    npm audit --audit-level=moderate --json > npm-audit.json || true
-                    # Convert npm audit to SARIF
-                    node -e "
+      
+      - name: Upload Safety SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('backend/safety-results.sarif') != ''
+        with:
+          sarif_file: backend/safety-results.sarif
+          category: safety
+      
+      # JavaScript/Node.js Analysis with ESLint
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Install ESLint Security Plugin
+        run: |
+          cd frontend
+          npm install --save-dev eslint @eslint/js eslint-plugin-security @microsoft/eslint-formatter-sarif
+      
+      - name: Run ESLint Security Analysis
+        run: |
+          cd frontend
+          npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif || true
+      
+      - name: Upload ESLint SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('frontend/eslint-results.sarif') != ''
+        with:
+          sarif_file: frontend/eslint-results.sarif
+          category: eslint
+      
+      # Node.js Dependency Vulnerability Scanning
+      - name: Run npm audit
+        run: |
+          cd frontend
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          # Convert npm audit to SARIF
+          node -e "
           const fs = require('fs');
           const auditData = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
 
           const sarif = {
-            '\$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+            '$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
             'version': '2.1.0',
             'runs': [{
               'tool': {

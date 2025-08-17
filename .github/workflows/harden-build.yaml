@@ -382,7 +382,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}'
+          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:main'
           format: 'sarif'
           output: 'trivy-${{ matrix.service }}.sarif'
         continue-on-error: true
@@ -418,7 +418,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
         with:
-          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}'
+          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:main'
           format: 'table'
           severity: 'HIGH,CRITICAL'
           exit-code: '1'  # Fail the build on high/critical vulnerabilities
@@ -453,7 +453,7 @@ jobs:
       
       - name: Sign container image
         run: |
-          cosign sign --yes ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:${{ github.sha }}
+          cosign sign --yes ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:main
 
   helm-release:
     runs-on: ubuntu-latest

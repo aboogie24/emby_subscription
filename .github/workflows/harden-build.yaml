@@ -79,6 +79,8 @@ jobs:
           try:
               with open('safety-results.json', 'r') as f:
                   content = f.read().strip()
+                  print('Converted to dict')
+                  print(content)
                   if not content:
                       safety_data = {'vulnerabilities': []}
                   else:

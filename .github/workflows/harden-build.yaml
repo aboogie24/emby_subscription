@@ -70,8 +70,8 @@ jobs:
           safety check --output json > safety-results.json || echo '{"vulnerabilities": []}' > safety-results.json
           cat safety-results.json
           
-          # Convert to SARIF format (simplified)
-          python -c "
+          # Convert to SARIF format (fixed)
+          python3 -c "
           import json
           import sys
           import os
@@ -79,7 +79,7 @@ jobs:
           try:
               with open('safety-results.json', 'r') as f:
                   content = f.read().strip()
-                  print('Converted to dict')
+                  print('Reading safety results...')
                   print(content)
                   if not content:
                       safety_data = {'vulnerabilities': []}
@@ -88,8 +88,8 @@ jobs:
               
               print(f'Safety scan results: {safety_data}')
               
-              sarif = {
-                  '$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+              # Create SARIF structure without \$schema first
+              sarif_data = {
                   'version': '2.1.0',
                   'runs': [{
                       'tool': {
@@ -116,7 +116,7 @@ jobs:
                   package_name = vuln.get('package_name', vuln.get('package', vuln.get('dependency_name', 'unknown')))
                   advisory = vuln.get('advisory', vuln.get('title', vuln.get('description', 'No description')))
                   severity = vuln.get('severity', 'unknown')
-                  sarif['runs'][0]['results'].append({
+                  sarif_data['runs'][0]['results'].append({
                       'ruleId': vuln_id,
                       'level': 'error' if severity.lower() in ['high', 'critical'] else 'warning',
                       'message': {
@@ -135,23 +135,27 @@ jobs:
                       }]
                   })
               
+              # Write SARIF with proper \$schema handling
               with open('safety-results.sarif', 'w') as f:
-                  json.dump(sarif, f, indent=2)
+                  f.write('{\\n')
+                  f.write('  \"\$schema\": \"https://json.schemastore.org/sarif-2.1.0.json\",\\n')
+                  # Write the rest without the opening brace
+                  sarif_json = json.dumps(sarif_data, indent=2)
+                  f.write(sarif_json[1:])  # Remove opening brace
               
               print(f'Created SARIF with {len(vulnerabilities)} vulnerabilities')
           except Exception as e:
               print(f'Error processing safety results: {e}')
-              # Create empty SARIF on error
-              empty_sarif = {
-                  '$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
-                  'version': '2.1.0',
-                  'runs': [{
-                      'tool': {'driver': {'name': 'Safety', 'version': '3.6.0'}},
-                      'results': []
-                  }]
-              }
+              # Create minimal valid SARIF on error
               with open('safety-results.sarif', 'w') as f:
-                  json.dump(empty_sarif, f, indent=2)      
+                  f.write('{\\n')
+                  f.write('  \"\$schema\": \"https://json.schemastore.org/sarif-2.1.0.json\",\\n')
+                  f.write('  \"version\": \"2.1.0\",\\n')
+                  f.write('  \"runs\": [{\\n')
+                  f.write('    \"tool\": {\"driver\": {\"name\": \"Safety\", \"version\": \"3.6.0\"}},\\n')
+                  f.write('    \"results\": []\\n')
+                  f.write('  }]\\n')
+                  f.write('}\\n')
           "
       
       - name: Upload Safety SARIF
@@ -196,13 +200,12 @@ jobs:
         run: |
           cd frontend
           npm audit --audit-level=moderate --json > npm-audit.json || true
-          # Convert npm audit to SARIF
+          # Convert npm audit to SARIF (fixed)
           node -e "
           const fs = require('fs');
           const auditData = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
 
-          const sarif = {
-            '$schema': 'https://json.schemastore.org/sarif-2.1.0.json',
+          const sarifData = {
             'version': '2.1.0',
             'runs': [{
               'tool': {
@@ -217,7 +220,7 @@ jobs:
 
           if (auditData.vulnerabilities) {
             Object.entries(auditData.vulnerabilities).forEach(([pkg, vuln]) => {
-              sarif.runs[0].results.push({
+              sarifData.runs[0].results.push({
                 'ruleId': vuln.name || 'NPM-AUDIT',
                 'level': vuln.severity === 'critical' || vuln.severity === 'high' ? 'error' : 'warning',
                 'message': {
@@ -234,7 +237,12 @@ jobs:
             });
           }
 
-          fs.writeFileSync('npm-audit.sarif', JSON.stringify(sarif, null, 2));
+          // Write SARIF with proper \$schema handling
+          let sarifContent = '{\\n';
+          sarifContent += '  \"\$schema\": \"https://json.schemastore.org/sarif-2.1.0.json\",\\n';
+          const sarifJson = JSON.stringify(sarifData, null, 2);
+          sarifContent += sarifJson.substring(1); // Remove opening brace
+          fs.writeFileSync('npm-audit.sarif', sarifContent);
           "
                 
       - name: Upload npm audit SARIF

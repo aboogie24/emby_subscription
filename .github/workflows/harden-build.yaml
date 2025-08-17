@@ -67,7 +67,7 @@ jobs:
         run: |
           cd backend
           safety scan --help 
-          safety scan --json --output safety-results.json
+          safety scan --output json > safety-results.json
           cat safety-results.json
           
           # Convert to SARIF format (simplified)

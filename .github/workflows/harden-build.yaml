@@ -439,6 +439,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-push-container
     if: github.event_name != 'pull_request'
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
     strategy:
       matrix:
@@ -448,6 +451,10 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
       
+      - name: Manual Test
+        run: |
+          env 
+      
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -456,7 +463,7 @@ jobs:
       
       - name: Sign container image
         run: |
-          cosign sign --yes ${{ secrets.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:main
+          cosign sign --yes ${{ env.DOCKERHUB_USERNAME }}/emby-subscription-${{ matrix.service }}:main
 
   helm-release:
     runs-on: ubuntu-latest

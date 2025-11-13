@@ -24,6 +24,14 @@ backend:
     SMTP_USERNAME: "20db3ec6a6b663"
     SMTP_PASSWORD: "83b2f0f6d44ed7"
     FROM_EMAIL: "noreply@yourdomain.com"
+  
+  instrumentation:
+    enabled: true
+    language: python
+    name: otel-instrumentation
+    namespace: otel-collector
+
+  podAnnotations: {}
   persistence:
     enabled: true
     size: 1Gi
@@ -43,6 +51,12 @@ frontend:
   env:
     VITE_API_URL: "http://emby-backend:8000"
     VITE_ALLOWED_HOSTS: "signup.justpurple.org,proxy.justpurple.org"
+  instrumentation:
+    enabled: true
+    name: otel-instrumentation
+    namespace: otel-collector
+    language: javascript
+  podAnnotations: {}
 
 # Migration
 migration:

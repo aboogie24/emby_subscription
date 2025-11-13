@@ -10,6 +10,13 @@ spec:
       app: emby-backend
   template:
     metadata:
+      anotations:
+        {{ if .Values.backend.instrumentation.enabled }}
+        instrumentation.opentelemetry.io/inject-{{ .Values.backend.instrumentation.language }}: "{{ .Values.backend.instrumentation.namespace }}/{{ .Values.backend.instrumentation.name }}"
+        {{- end }}
+        {{- with .Values.backend.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
         app: emby-backend
     spec:
